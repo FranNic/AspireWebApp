@@ -1,0 +1,44 @@
+﻿@page "/todo"
+@using global::Todo.Domain
+@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)]
+
+@inject TodoApiClient TodoApiClient
+<h3>Todo</h3>
+
+@if (todoLists == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Items</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var todoList in todoLists)
+            {
+                <tr>
+                    <td>@todoList.Title</td>
+                    <td>@todoList.Items.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+}
+
+@code {
+
+private TodoList[]? todoLists;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var enumerable = await TodoApiClient.GetTodoListsAsync();
+        todoLists = enumerable.ToArray();
+    }
+}

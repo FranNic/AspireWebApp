@@ -19,7 +19,7 @@ public class TodoListController : ControllerBase
         _dbContext = todoContext;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
+    [HttpGet(Name = "GetAll")]
     public IEnumerable<TodoList> Get()
     {
         return _dbContext.TodoLists.Include(x => x.Items).ToArray();
