@@ -1,0 +1,58 @@
+﻿@page "/pomodoro"
+@rendermode InteractiveServer
+@inject PomodoroState PomodoroState
+
+<PageTitle>Pomodoro</PageTitle>
+
+<h1>Pomodoro</h1>
+<div class="row">
+    <div class="col-sm-12" align="center">
+        <h1 style="font-size: 5em;">@TimeLeft</h1>
+        <div class="col-sm-2" align="center">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button class="btn btn-primary" @onclick="Start" disabled="@PomodoroState.IsRunning">Start</button>
+                <button class="btn btn-warning" @onclick="Reset">Reset</button>
+                <button class="btn btn-danger" @onclick="Stop" disabled="@PomodoroState.IsStopped">Stop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<audio id="successPomodoro" src="mario_coin_sound.mp3" />
+@code {
+    public string TimeLeft => TimeSpan.FromSeconds(PomodoroState.PomodoroTimerValue).ToString(@"mm\:ss");
+    private System.Threading.Timer Timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PomodoroState.OnChange += StateHasChanged;
+        PomodoroState.OnChangedSession += PlaySound;
+        Timer = new System.Threading.Timer(_ =>
+        {
+            InvokeAsync(StateHasChanged);
+        }, null, 500, 500);
+    }
+
+    private void Start() => PomodoroState.PomodoroTimer.Start();
+
+    private void Reset()
+    {
+        PomodoroState.PomodoroTimer.Dispose();
+        PomodoroState.InitializeTimer();
+    }
+
+    private void Stop() => PomodoroState.PomodoroTimer.Stop();
+
+    private void PlaySound()
+    {
+        // JsRuntime.InvokeAsync<string>("PlaySound"); // this calls "window.PlaySound()"
+        Console.WriteLine("PlaySound");
+    }
+
+    // Dispose all events
+    public void Dispose()
+    {
+        PomodoroState.OnChange -= StateHasChanged;
+        PomodoroState.OnChangedSession -= PlaySound;
+    }
+}

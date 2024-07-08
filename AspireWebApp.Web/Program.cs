@@ -1,11 +1,14 @@
 using AspireWebApp.Web;
 using AspireWebApp.Web.Components;
+using AspireWebApp.Web.Components.Pages.Pomodoro;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
+builder.Services.AddSingleton<PomodoroState>();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
