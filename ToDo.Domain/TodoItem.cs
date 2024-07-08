@@ -1,37 +1,16 @@
-﻿namespace ToDo.Domain;
+﻿namespace Todo.Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-using MediatR;
-
-public class TodoItem : AuditableEntity
+public class TodoItem
 {
-    public int Id { get; set; }
-
-    public int ListId { get; set; }
-
-    public string Title { get; set; } = string.Empty;
-
-    public string? Note { get; set; }
-
-    public PriorityLevel Priority { get; set; }
-
-    public DateTime? Reminder { get; set; }
-
-    private bool _done;
-    public bool Done
-    {
-        get => _done;
-        set
-        {
-            if (value == true && _done == false)
-            {
-                DomainEvents.Add(new TodoItemCompletedEvent(this));
-            }
-
-            _done = value;
-        }
-    }
-
-    public TodoList List { get; set; } = null!;
-
-    public List<INotification> DomainEvents { get; set; } = new List<INotification>();
+    public Guid Id { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public bool IsDone { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
 }

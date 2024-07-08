@@ -12,11 +12,16 @@
   <ItemGroup>
     <ProjectReference Include="..\AspireWebApp.ApiService\AspireWebApp.ApiService.csproj" />
     <ProjectReference Include="..\AspireWebApp.Web\AspireWebApp.Web.csproj" />
+    <ProjectReference Include="..\Todo.API\Todo.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.1" />
+    <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" Version="8.0.2" />
+    <PackageReference Include="Aspire.Hosting.Azure.Sql" Version="8.0.2" />
     <PackageReference Include="Aspire.Hosting.Redis" Version="8.0.1" />
+    <PackageReference Include="Aspire.Microsoft.Azure.Cosmos" Version="8.0.2" />
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.Cosmos" Version="8.0.2" />
   </ItemGroup>
 
 </Project>
