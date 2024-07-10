@@ -1,12 +1,7 @@
 ﻿namespace Todo.Infrastructure.Configuration;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using Todo.Domain;
 
@@ -23,6 +18,11 @@ public class TodoListConfiguration : IEntityTypeConfiguration<TodoList>
         //builder
         //    .OwnsOne(b => b.Colour);
 
-        builder.HasMany(x => x.Items);
+        builder.Property(t => t.Version).IsConcurrencyToken();
+
+        builder.HasMany(e => e.Items)
+            .WithOne(e => e.List)
+            .HasForeignKey(e => e.ListId);
     }
+
 }

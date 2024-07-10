@@ -1,12 +1,7 @@
 ﻿namespace Todo.Infrastructure.Configuration;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using Todo.Domain;
 
@@ -20,6 +15,9 @@ public class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
             .HasMaxLength(200)
             .IsRequired();
 
-        //builder.Ignore(d => d.DomainEvents);
+        builder.Property(t => t.Description).IsRequired(false);
+
+        builder.Property(t => t.Version).IsConcurrencyToken();
+
     }
 }

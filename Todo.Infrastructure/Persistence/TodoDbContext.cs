@@ -20,21 +20,19 @@ public class TodoDbContext : DbContext, ITodoDbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        //foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
-        //{
-        //    switch (entry.State)
-        //    {
-        //        case EntityState.Added:
-        //            //entry.Entity.CreatedBy = _currentUserService.UserId;
-        //            entry.Entity.Created = _dateTime.Now;
-        //            break;
+        foreach (var entry in ChangeTracker.Entries<Entity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.Version = Guid.NewGuid();
+                    break;
 
-        //        case EntityState.Modified:
-        //            //entry.Entity.LastModifiedBy = _currentUserService.UserId;
-        //            entry.Entity.LastModified = _dateTime.Now;
-        //            break;
-        //    }
-        //}
+                case EntityState.Modified:
+                    entry.Entity.Version = Guid.NewGuid();
+                    break;
+            }
+        }
 
         //var events = ChangeTracker.Entries<IHasDomainEvent>()
         //        .Select(x => x.Entity.DomainEvents)

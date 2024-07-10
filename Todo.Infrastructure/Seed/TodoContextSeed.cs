@@ -1,8 +1,7 @@
 ﻿namespace Todo.Infrastructure.Seed;
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Todo.Domain;
@@ -23,27 +22,32 @@ public static class TodoDbContextSeed
                     {
                         Title = "Apples",
                         Description = "Buy a dozen apples",
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        Version = Guid.NewGuid()
                     },
                     new TodoItem
                     {
                         Title = "Milk",
                         Description = "Buy 2l of milk",
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        Version = Guid.NewGuid()
                     },
                     new TodoItem
                     {
                         Title = "Bread",
                         Description = "Buy a loaf of bread",
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        Version = Guid.NewGuid()
                     },
                     new TodoItem
                     {
                         Title = "Toilet paper",
                         Description = "Buy a pack of toilet paper",
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        Version = Guid.NewGuid()
                     }
-                }
+                },
+                Version = Guid.NewGuid()
             };
 
             context.TodoLists.Add(todoList);

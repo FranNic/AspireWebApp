@@ -12,7 +12,7 @@ using Todo.Infrastructure.Persistence;
 namespace Todo.Infrastructure.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20240708205143_Initial")]
+    [Migration("20240710143843_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -38,23 +38,26 @@ namespace Todo.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDone")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("ListId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("TodoListId")
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TodoListId");
+                    b.HasIndex("ListId");
 
                     b.ToTable("TodoItems");
                 });
@@ -70,6 +73,10 @@ namespace Todo.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("TodoLists");
@@ -77,9 +84,13 @@ namespace Todo.Infrastructure.Migrations
 
             modelBuilder.Entity("Todo.Domain.TodoItem", b =>
                 {
-                    b.HasOne("Todo.Domain.TodoList", null)
+                    b.HasOne("Todo.Domain.TodoList", "List")
                         .WithMany("Items")
-                        .HasForeignKey("TodoListId");
+                        .HasForeignKey("ListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("List");
                 });
 
             modelBuilder.Entity("Todo.Domain.TodoList", b =>

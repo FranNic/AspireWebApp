@@ -1,5 +1,6 @@
 ﻿@page "/todo"
-@using global::Todo.Domain
+@using AspireWebApp.Web.Helpers
+@using global::Todo.Application.DTOs
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
 
@@ -25,20 +26,30 @@ else
                 <tr>
                     <td>@todoList.Title</td>
                     <td>@todoList.Items.Count</td>
+                    <td><a class="btn btn-primary" href="@ItemHelper.Url(todoList)">View</a></td>
                 </tr>
             }
         </tbody>
     </table>
-    
+
 }
 
 @code {
 
-private TodoList[]? todoLists;
+    private TodoListDto[]? todoLists;
 
     protected override async Task OnInitializedAsync()
     {
-        var enumerable = await TodoApiClient.GetTodoListsAsync();
-        todoLists = enumerable.ToArray();
+        try
+        {
+            var enumerable = await TodoApiClient.GetTodoListsAsync();
+
+            todoLists = enumerable.ToArray();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
     }
 }

@@ -3,11 +3,13 @@ namespace Todo.API.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Todo.Application.DTOs;
+using Todo.Application.Mappers;
 using Todo.Domain;
 using Todo.Infrastructure.Persistence;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class TodoListController : ControllerBase
 {
     private readonly ILogger<TodoListController> _logger;
@@ -20,23 +22,21 @@ public class TodoListController : ControllerBase
     }
 
     [HttpGet(Name = "GetAll")]
-    public IEnumerable<TodoList> Get()
+    public IEnumerable<TodoListDto> Get()
     {
-        return _dbContext.TodoLists.Include(x => x.Items).ToArray();
+        return _dbContext.TodoLists.AsNoTracking().Include(x => x.Items).Select(x => x.ToDto()).ToArray();
+    }
 
+    [HttpGet("{id}", Name = "GetById")]
+    public async Task<ActionResult<TodoListDto>> GetById(Guid id)
+    {
+        var todoList = await _dbContext.TodoLists.AsNoTracking().Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == id);
 
-        return Enumerable.Range(1, 5).Select(index => new TodoList
+        if (todoList == null)
         {
-            Id = Guid.NewGuid(),
-            Items = new List<TodoItem>
-            {
-                new TodoItem
-                {
-                    Id = Guid.NewGuid(),
-                    Title = $"Item {index}",
-                    IsDone = false
-                }
-            }
-        }).ToArray();
+            return NotFound();
+        }
+
+        return todoList.ToDto();
     }
 }
