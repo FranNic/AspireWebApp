@@ -9,7 +9,6 @@ builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
 builder.Services.AddSingleton<PomodoroState>();
 
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -23,10 +22,10 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
 
 builder.Services.AddHttpClient<TodoApiClient>(client =>
 {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://todo-api");
-    });
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https+http://todo-api");
+});
 
 var app = builder.Build();
 

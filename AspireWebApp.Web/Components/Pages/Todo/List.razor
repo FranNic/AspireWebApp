@@ -24,69 +24,26 @@ else
 
                             <EditForm Model="TodoItemToAdd" Formname="add-task" OnSubmit="@AddTask" class="d-flex justify-content-center align-items-center mb-4">
                                 <div data-mdb-input-init class="form-outline flex-fill">
-                                    <InputText type="text" id="form3" class="form-control form-control-lg" @bind-Value="TodoItemToAdd.Title"/>
-                                    <label class="form-label" for="form3">What do you need to do today?</label>
+                                    <InputText type="text" id="form3" class="form-control form-control-lg" @bind-Value="TodoItemToAdd.Title" placeholder="What do you need to do today?" />
                                 </div>
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg ms-2">Add</button>
                             </EditForm>
-@* 
                             <ul class="list-group mb-0">
-                                <li class="list-group-item d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                                        Cras justo odio
-                                    </div>
-                                    <a href="#!" data-mdb-tooltip-init title="Remove item">
-                                        <i class="fas fa-times text-primary"></i>
-                                    </a>
-                                </li>
-                                <li class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." checked />
-                                        <s>Dapibus ac facilisis in</s>
-                                    </div>
-                                    <a href="#!" data-mdb-tooltip-init title="Remove item">
-                                        <i class="fas fa-times text-primary"></i>
-                                    </a>
-                                </li>
-                                <li class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                                        Morbi leo risus
-                                    </div>
-                                    <a href="#!" data-mdb-tooltip-init title="Remove item">
-                                        <i class="fas fa-times text-primary"></i>
-                                    </a>
-                                </li>
-                                <li class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                                        Porta ac consectetur ac
-                                    </div>
-                                    <a href="#!" data-mdb-tooltip-init title="Remove item">
-                                        <i class="fas fa-times text-primary"></i>
-                                    </a>
-                                </li>
-                                <li class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-0">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." checked />
-                                        Vestibulum at eros
-                                    </div>
-                                    <a href="#!" data-mdb-tooltip-init title="Remove item">
-                                        <i class="fas fa-times text-primary"></i>
-                                    </a>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
-                                        Morbi leo risus
-                                    </div>
-                                    <a href="#!" data-mdb-tooltip-init title="Remove item">
-                                        <i class="fas fa-times text-primary"></i>
-                                    </a>
-                                </li>
+
+                                @foreach (var item in EditableTodoItems)
+                                {
+
+                                    <li class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <InputCheckbox class="form-check-input me-2" type="checkbox" @bind-Value="item.IsDone" aria-label="..." @onchange="@(e=> UpdateTodoItem(e, item))" />
+                                            <InputText @bind-Value="item!.Title" @onchange="@(e=> UpdateTodoItem(e, item))" style="@(item.IsDone ? "text-decoration: line-through;":"")" />
+                                        </div>
+                                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-danger btn-sm ms-2" @onclick="@(e=> Delete(e, item.Id))">Delete</button>
+                                    </li>
+
+                                }
                             </ul>
- *@
+
                         </div>
                     </div>
 
@@ -104,12 +61,17 @@ else
     private TodoItemDto TodoItemToAdd { get; set; } = new TodoItemDto();
 
 
+    [SupplyParameterFromForm]
+    private TodoItemDto[] EditableTodoItems { get; set; }
+
+
     [Parameter]
     public Guid TodoListId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         todoList = await TodoApiClient.GetTodoListAsync(TodoListId);
+        EditableTodoItems = todoList.Items.ToArray();
     }
 
     private async Task AddTask()
@@ -126,6 +88,25 @@ else
 
         // Clear the task name
         taskName = null;
+
+        // refresh the UI
+        StateHasChanged();
+    }
+
+    private async Task Delete(MouseEventArgs e, Guid todoItemDtoId)
+    {
+        // call the api
+        await TodoApiClient.DeleteTodoItemAsync(todoItemDtoId);
+
+        // refresh the UI
+        StateHasChanged();
+    }
+
+
+    private async Task UpdateTodoItem(ChangeEventArgs e, TodoItemDto todoItemDto)
+    {
+        // call the api
+        await TodoApiClient.UpdateTodoItemAsync(todoList.Id, todoItemDto);
 
         // refresh the UI
         StateHasChanged();

@@ -11,7 +11,7 @@ public static class ProjectAssembly
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-        
+
         return services;
     }
 }

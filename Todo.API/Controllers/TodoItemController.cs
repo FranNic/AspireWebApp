@@ -1,5 +1,5 @@
 ﻿namespace Todo.API.Controllers;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,20 +42,72 @@ public class TodoItemController : ControllerBase
 
             _dbContext.TodoItems.Add(item);
 
-
             await _dbContext.SaveChangesAsync();
             // return created
             return Created("GetById", item);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
 
-            
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid todolistId, Guid id) => throw new NotImplementedException();
+
+
+    [HttpDelete("{todoId}")]
+    public async Task<IActionResult> DeleteTodoItem(Guid todolistId, Guid todoId)
+    {
+        try
+        {
+            var todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
+            if (todoitemToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.TodoItems.Remove(todoitemToUpdate);
+
+            await _dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
 
-            throw;
+            _logger.LogError($"Something happened: {ex}");
         }
 
+        return Ok();
     }
 
-    private object GetById() => throw new NotImplementedException();
+
+    [HttpPut("{todoId}")]
+    public async Task<IActionResult> UpdateTodoItem(Guid todolistId, Guid todoId, TodoItemDto newItem)
+    {
+        try
+        {
+            var todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
+            if (todoitemToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            todoitemToUpdate.Title = newItem.Title;
+            todoitemToUpdate.Description = newItem.Description;
+            todoitemToUpdate.IsDone = newItem.IsDone;
+
+            _dbContext.TodoItems.Update(todoitemToUpdate);
+
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Something happened: {ex}");
+        }
+
+        return Ok();
+    }
+
+
 }

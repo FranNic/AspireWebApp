@@ -24,5 +24,4 @@ public class TodoListConfiguration : IEntityTypeConfiguration<TodoList>
             .WithOne(e => e.List)
             .HasForeignKey(e => e.ListId);
     }
-
 }

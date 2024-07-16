@@ -1,4 +1,5 @@
 ﻿namespace Todo.Domain;
+
 using System.Reflection;
 
 public static class ProjectAssembly

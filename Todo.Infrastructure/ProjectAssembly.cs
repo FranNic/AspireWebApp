@@ -1,14 +1,14 @@
 ﻿namespace Todo.Infrastructure;
 
-using System.Reflection;
-using System;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Todo.Infrastructure.Services;
-using Todo.Infrastructure.Persistence;
+
+using System.Reflection;
+
 using Todo.Application;
+using Todo.Infrastructure.Persistence;
+using Todo.Infrastructure.Services;
 
 public static class ProjectAssembly
 {
@@ -18,7 +18,7 @@ public static class ProjectAssembly
                 options.UseSqlServer(
                     configuration.GetConnectionString("localhost"),
                     b => b.MigrationsAssembly(typeof(TodoDbContext).Assembly.FullName)));
-        
+
         services.AddTransient<IDateTime, DateTimeService>();
 
         services.AddScoped<ITodoDbContext>(provider => provider.GetRequiredService<TodoDbContext>());

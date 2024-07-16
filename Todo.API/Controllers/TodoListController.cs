@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 using Todo.Application.DTOs;
 using Todo.Application.Mappers;
-using Todo.Domain;
 using Todo.Infrastructure.Persistence;
 
 [ApiController]

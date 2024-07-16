@@ -18,6 +18,5 @@ public class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
         builder.Property(t => t.Description).IsRequired(false);
 
         builder.Property(t => t.Version).IsConcurrencyToken();
-
     }
 }
