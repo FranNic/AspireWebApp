@@ -35,18 +35,18 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
     }
 
     // add delete
-    public async Task DeleteTodoItemAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteTodoItemAsync(Guid listId, Guid todoItemId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var result = await httpClient.DeleteAsync($"api/todolist/{id}/todoitem", cancellationToken);
+            var result = await httpClient.DeleteAsync($"api/todolist/{listId}/todoitem/{todoItemId}", cancellationToken);
             if (!result.IsSuccessStatusCode)
             {
-                logger.LogError("Failed to delete todo item {id}", id);
-                return;
+                logger.LogError("Failed to delete todo item {todoItemId}", todoItemId);
+                return false;
             }
 
-            return;
+            return true;
         }
         catch (Exception ex)
         {
@@ -59,7 +59,7 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
     {
         try
         {
-            var result = await httpClient.PutAsJsonAsync($"api/todolist/{id}/todoitem", todoItem, cancellationToken);
+            var result = await httpClient.PutAsJsonAsync($"api/todolist/{id}/todoitem/{todoItem.Id}", todoItem, cancellationToken);
             if (!result.IsSuccessStatusCode)
             {
                 logger.LogError("Failed to update todo item {id}", id);
@@ -72,5 +72,10 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
         {
             throw;
         }
+    }
+
+    public async Task<TodoItemDto> GetTodoItemAsync(Guid listId, Guid todoItemId, CancellationToken cancellationToken = default)
+    {
+        return await httpClient.GetFromJsonAsync<TodoItemDto>($"api/todolist/{listId}/todoitem/{todoItemId}", cancellationToken);
     }
 }

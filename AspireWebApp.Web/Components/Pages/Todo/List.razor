@@ -1,7 +1,12 @@
 ﻿@page "/todo/{TodoListId:guid}"
+
+@rendermode InteractiveServer
+
+@using AspireWebApp.Web.Helpers
 @using global::Todo.Application.DTOs
 
 
+@inject NavigationManager Navigation
 @inject TodoApiClient TodoApiClient
 
 <h3>Todo List</h3>
@@ -29,21 +34,27 @@ else
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg ms-2">Add</button>
                             </EditForm>
                             <ul class="list-group mb-0">
-
                                 @foreach (var item in EditableTodoItems)
                                 {
 
-                                    <li class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
+                                    <li class="list-group-item d-flex d-flex align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
                                         <div class="d-flex align-items-center">
-                                            <InputCheckbox class="form-check-input me-2" type="checkbox" @bind-Value="item.IsDone" aria-label="..." @onchange="@(e=> UpdateTodoItem(e, item))" />
-                                            <InputText @bind-Value="item!.Title" @onchange="@(e=> UpdateTodoItem(e, item))" style="@(item.IsDone ? "text-decoration: line-through;":"")" />
+                                            <input class="form-check-input me-2" type="checkbox" checked="@item.IsDone" @oninput="@(() => SwitchIsDone(item))" />
+                                            <span style="@(item.IsDone ? "text-decoration: line-through;":"")">@item!.Title </span>
                                         </div>
-                                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-danger btn-sm ms-2" @onclick="@(e=> Delete(e, item.Id))">Delete</button>
+                                        <div class="col col-xl-3">
+                                            <a class="btn btn-default" href="@ItemHelper.TodoItemUrl(todoList, item)">Edit</a>
+                                            <button class="btn btn-danger" @onclick="@(() => { ShowDeleteConfirmation = true; ItemToDelete = item.Id;})">Delete</button>
+                                        </div>
+
                                     </li>
 
+                                    if (ShowDeleteConfirmation && item.Id.Equals(ItemToDelete))
+                                    {
+                                        <DeletePrompt Confirmation="@(async result => await ConfirmDeleteAsync(result, item.Id))" />
+                                    }
                                 }
                             </ul>
-
                         </div>
                     </div>
 
@@ -60,18 +71,25 @@ else
     [SupplyParameterFromForm]
     private TodoItemDto TodoItemToAdd { get; set; } = new TodoItemDto();
 
-
     [SupplyParameterFromForm]
     private TodoItemDto[] EditableTodoItems { get; set; }
-
 
     [Parameter]
     public Guid TodoListId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    // Tracking of asynchronous calls.
+    private bool Loading;
+    // Set to true when delete is requested.
+    private bool ShowDeleteConfirmation = false;
+    private Guid ItemToDelete { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
     {
+        Loading = true;
         todoList = await TodoApiClient.GetTodoListAsync(TodoListId);
         EditableTodoItems = todoList.Items.ToArray();
+        Loading = false;
     }
 
     private async Task AddTask()
@@ -90,25 +108,63 @@ else
         taskName = null;
 
         // refresh the UI
-        StateHasChanged();
+        Navigation.Refresh(true);
     }
 
-    private async Task Delete(MouseEventArgs e, Guid todoItemDtoId)
+    private async Task SwitchIsDone(TodoItemDto todoItemDto)
     {
-        // call the api
-        await TodoApiClient.DeleteTodoItemAsync(todoItemDtoId);
+        if (todoItemDto == null)
+        {
+            return;
+        }
 
-        // refresh the UI
-        StateHasChanged();
+        todoItemDto.IsDone = !todoItemDto.IsDone;
+
+        // get the checkbox state
+        await TodoApiClient.UpdateTodoItemAsync(TodoListId, todoItemDto);
+
+        Navigation.Refresh(true);
     }
-
 
     private async Task UpdateTodoItem(ChangeEventArgs e, TodoItemDto todoItemDto)
     {
         // call the api
         await TodoApiClient.UpdateTodoItemAsync(todoList.Id, todoItemDto);
 
-        // refresh the UI
-        StateHasChanged();
+        // refresh the UI on servermode
+        Navigation.Refresh(true);
     }
+
+    // Confirm deletion.
+    // result is True when user confirmed.
+    private async Task ConfirmDeleteAsync(bool result, Guid id)
+    {
+        if (result)
+        {
+            await DeleteAsync(id);
+        }
+        else
+        {
+            ShowDeleteConfirmation = false;
+        }
+    }
+
+    private async Task DeleteAsync(Guid id)
+    {
+        if (Loading)
+        {
+            // Avoid concurrent requests.
+            return;
+        }
+
+        // call the api
+        bool response = await TodoApiClient.DeleteTodoItemAsync(TodoListId, id);
+
+        if (response)
+        {
+            // refresh the UI on servermode
+            Navigation.Refresh(true);
+        }
+    }
+
 }

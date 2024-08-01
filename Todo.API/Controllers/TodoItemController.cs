@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 
 using Todo.Application.DTOs;
+using Todo.Application.Mappers;
 using Todo.Domain;
 using Todo.Infrastructure.Persistence;
 
@@ -53,7 +54,23 @@ public class TodoItemController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid todolistId, Guid id) => throw new NotImplementedException();
+    public async Task<IActionResult> GetById(Guid todolistId, Guid id)
+    {
+        try
+        {
+            var todoitem = await _dbContext.TodoItems.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (todoitem == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(todoitem.ToDto());
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
 
 
     [HttpDelete("{todoId}")]
@@ -108,6 +125,4 @@ public class TodoItemController : ControllerBase
 
         return Ok();
     }
-
-
 }
