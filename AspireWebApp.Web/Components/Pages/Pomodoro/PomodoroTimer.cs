@@ -1,7 +1,9 @@
 ﻿namespace AspireWebApp.Web.Components.Pages.Pomodoro;
+
 using System.Timers;
 
-public enum Session { Work, Break, LongBreak };
+public enum Session
+{ Work, Break, LongBreak };
 
 public class PomodoroTimer : Timer
 {

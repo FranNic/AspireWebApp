@@ -1,0 +1,170 @@
+﻿@page "/todo/{TodoListId:guid}"
+
+@rendermode InteractiveServer
+
+@using AspireWebApp.Web.Helpers
+@using global::Todo.Application.DTOs
+
+
+@inject NavigationManager Navigation
+@inject TodoApiClient TodoApiClient
+
+<h3>Todo List</h3>
+
+@if (todoList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <section class="vh-100" style="background-color: #e2d5de;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col col-xl-10">
+
+                    <div class="card" style="border-radius: 15px;">
+                        <div class="card-body p-5">
+
+                            <h6 class="mb-3">Awesome Todo List</h6>
+
+                            <EditForm Model="TodoItemToAdd" Formname="add-task" OnSubmit="@AddTask" class="d-flex justify-content-center align-items-center mb-4">
+                                <div data-mdb-input-init class="form-outline flex-fill">
+                                    <InputText type="text" id="form3" class="form-control form-control-lg" @bind-Value="TodoItemToAdd.Title" placeholder="What do you need to do today?" />
+                                </div>
+                                <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg ms-2">Add</button>
+                            </EditForm>
+                            <ul class="list-group mb-0">
+                                @foreach (var item in EditableTodoItems)
+                                {
+
+                                    <li class="list-group-item d-flex d-flex align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <input class="form-check-input me-2" type="checkbox" checked="@item.IsDone" @oninput="@(() => SwitchIsDone(item))" />
+                                            <span style="@(item.IsDone ? "text-decoration: line-through;":"")">@item!.Title </span>
+                                        </div>
+                                        <div class="col col-xl-3">
+                                            <a class="btn btn-default" href="@ItemHelper.TodoItemUrl(todoList, item)">Edit</a>
+                                            <button class="btn btn-danger" @onclick="@(() => { ShowDeleteConfirmation = true; ItemToDelete = item.Id;})">Delete</button>
+                                        </div>
+
+                                    </li>
+
+                                    if (ShowDeleteConfirmation && item.Id.Equals(ItemToDelete))
+                                    {
+                                        <DeletePrompt Confirmation="@(async result => await ConfirmDeleteAsync(result, item.Id))" />
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private TodoListDto? todoList;
+    private string? taskName;
+
+    [SupplyParameterFromForm]
+    private TodoItemDto TodoItemToAdd { get; set; } = new TodoItemDto();
+
+    [SupplyParameterFromForm]
+    private TodoItemDto[] EditableTodoItems { get; set; }
+
+    [Parameter]
+    public Guid TodoListId { get; set; }
+
+    // Tracking of asynchronous calls.
+    private bool Loading;
+    // Set to true when delete is requested.
+    private bool ShowDeleteConfirmation = false;
+    private Guid ItemToDelete { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Loading = true;
+        todoList = await TodoApiClient.GetTodoListAsync(TodoListId);
+        EditableTodoItems = todoList.Items.ToArray();
+        Loading = false;
+    }
+
+    private async Task AddTask()
+    {
+        if (string.IsNullOrWhiteSpace(TodoItemToAdd?.Title))
+        {
+            return;
+        }
+
+        TodoItemToAdd.Description = TodoItemToAdd.Title;
+
+        // call the api
+        await TodoApiClient.AddTodoItemAsync(todoList.Id, TodoItemToAdd);
+
+        // Clear the task name
+        taskName = null;
+
+        // refresh the UI
+        Navigation.Refresh(true);
+    }
+
+    private async Task SwitchIsDone(TodoItemDto todoItemDto)
+    {
+        if (todoItemDto == null)
+        {
+            return;
+        }
+
+        todoItemDto.IsDone = !todoItemDto.IsDone;
+
+        // get the checkbox state
+        await TodoApiClient.UpdateTodoItemAsync(TodoListId, todoItemDto);
+
+        Navigation.Refresh(true);
+    }
+
+    private async Task UpdateTodoItem(ChangeEventArgs e, TodoItemDto todoItemDto)
+    {
+        // call the api
+        await TodoApiClient.UpdateTodoItemAsync(todoList.Id, todoItemDto);
+
+        // refresh the UI on servermode
+        Navigation.Refresh(true);
+    }
+
+    // Confirm deletion.
+    // result is True when user confirmed.
+    private async Task ConfirmDeleteAsync(bool result, Guid id)
+    {
+        if (result)
+        {
+            await DeleteAsync(id);
+        }
+        else
+        {
+            ShowDeleteConfirmation = false;
+        }
+    }
+
+    private async Task DeleteAsync(Guid id)
+    {
+        if (Loading)
+        {
+            // Avoid concurrent requests.
+            return;
+        }
+
+        // call the api
+        bool response = await TodoApiClient.DeleteTodoItemAsync(TodoListId, id);
+
+        if (response)
+        {
+            // refresh the UI on servermode
+            Navigation.Refresh(true);
+        }
+    }
+
+}

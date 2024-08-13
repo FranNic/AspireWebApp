@@ -25,8 +25,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PomodoroState.OnChange += StateHasChanged;
-        PomodoroState.OnChangedSession += PlaySound;
+        // PomodoroState.OnChange += StateHasChanged;
+        // PomodoroState.OnChangedSession += PlaySound;
         Timer = new System.Threading.Timer(_ =>
         {
             InvokeAsync(StateHasChanged);
@@ -52,7 +52,8 @@
     // Dispose all events
     public void Dispose()
     {
-        PomodoroState.OnChange -= StateHasChanged;
-        PomodoroState.OnChangedSession -= PlaySound;
+        // PomodoroState.OnChange -= StateHasChanged;
+        // PomodoroState.OnChangedSession -= PlaySound;
+        Timer.Dispose();
     }
 }

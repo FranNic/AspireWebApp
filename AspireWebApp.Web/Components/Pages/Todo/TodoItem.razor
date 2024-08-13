@@ -1,0 +1,152 @@
+﻿@page "/todo/{TodoListId:guid}/{TodoItemId:guid}"
+
+@inject TodoApiClient TodoApiClient
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<h3>TodoItem</h3>
+
+
+@if (TodoItemDto is null && !Busy)
+{
+    <p>Could not find TodoItem with id @TodoItemId.</p>
+}
+else
+{
+    <TodoItemForm Busy="Busy"
+                  TodoItemDto="TodoItemDto"
+                  IsAdd="false"
+                  CancelRequest="Cancel"
+                  ValidationResult="@(async (success) => await HandleSubmitAsync(success))" />
+}
+@if (ConcurrencyError)
+{
+    <br />
+    <div class="alert alert-danger">
+        <p>
+            The TodoItem details have changed since it was last loaded. The updated fields are highlighted in the form.
+            Please choose an option:
+        </p>
+        <p><b>Cancel</b> to lose your changes and keep the database version.</p>
+        <p><b>Submit</b> to force an update with your version.</p>
+    </div>
+}
+@if (Error)
+{
+    <br />
+    <div class="alert alert-danger">Failed to update the TodoItem (@ErrorMessage).</div>
+}
+
+
+@code {
+    /// <summary>
+    /// Id of TodoItem to edit
+    /// </summary>
+    [Parameter]
+    public Guid TodoItemId { get; set; }
+
+    [Parameter]
+    public Guid TodoListId { get; set; }
+
+    /// <summary>
+    /// TodoItem being edited
+    /// </summary>
+    private TodoItemDto TodoItemDto { get; set; }
+
+    /// <summary>
+    /// Database version when concurrency issues exist
+    /// </summary>
+    private TodoItem DbTodoItem { get; set; }
+
+    /// <summary>
+    /// Start it up
+    /// </summary>
+    /// <returns>Task</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        Busy = true;
+
+        try
+        {
+            TodoItemDto = await TodoApiClient.GetTodoItemAsync(TodoListId, TodoItemId);
+        }
+        finally
+        {
+            Busy = false;
+        }
+    }
+
+    /// <summary>
+    /// Handle form submission request.
+    /// </summary>
+    /// <param name="success">True when the update was successful</param>
+    /// <returns>Task</returns>
+    private async Task HandleSubmitAsync(bool success)
+    {
+        if (Busy)
+        {
+            return;
+        }
+
+        if (!success)
+        {
+            // still need to edit model
+            Error = false;
+            ConcurrencyError = false;
+            return;
+        }
+
+        Busy = true;
+
+        try
+        {
+            await TodoApiClient.UpdateTodoItemAsync(TodoListId, TodoItemDto);
+            Navigation.NavigateTo($"/todo/{TodoListId}");
+        }
+        // catch (ApiException ex) when (ex.StatusCode == 409)
+        // {
+        //     ConcurrencyError = true;
+        //     DbTodoItem = ex.GetContentAs<TodoItem>();
+        // }
+        // catch (ApiException ex)
+        // {
+        //     Error = true;
+        //     ErrorMessage = ex.GetContentAs<string>();
+        // }
+        finally
+        {
+            Busy = false;
+        }
+    }
+
+    /// <summary>
+    /// Bail out!
+    /// </summary>
+    private void Cancel()
+    {
+        Busy = true;
+        Navigation.NavigateTo($"/");
+    }
+
+    /// <summary>
+    /// Avoid concurrent requests
+    /// </summary>
+    private bool Busy;
+
+    /// <summary>
+    /// An error occurred in the update
+    /// </summary>
+    private bool Error;
+
+    /// <summary>
+    /// A concurrency error needs resolution
+    /// </summary>
+    private bool ConcurrencyError;
+
+    /// <summary>
+    /// Error message
+    /// </summary>
+    private string ErrorMessage = string.Empty;
+
+}
