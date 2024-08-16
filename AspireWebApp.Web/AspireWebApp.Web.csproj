@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\Pages\Pomodoro\AppStateCounter.razor\**" />
+    <Content Remove="Components\Pages\Pomodoro\AppStateCounter.razor\**" />
+    <EmbeddedResource Remove="Components\Pages\Pomodoro\AppStateCounter.razor\**" />
+    <None Remove="Components\Pages\Pomodoro\AppStateCounter.razor\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AspireWebApp.ServiceDefaults\AspireWebApp.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Todo.Application\Todo.Application.csproj" />
   </ItemGroup>
@@ -14,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
     <PackageReference Include="System.Threading" Version="4.3.0" />
   </ItemGroup>
 

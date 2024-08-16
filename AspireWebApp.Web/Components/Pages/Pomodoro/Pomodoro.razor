@@ -1,5 +1,7 @@
 ﻿@page "/pomodoro"
-@rendermode InteractiveServer
+@using AspireWebApp.Web.Components.Pages.Pomodoro
+@using Web.Components.Layout
+@rendermode InteractiveWebAssembly
 @inject PomodoroState PomodoroState
 
 <PageTitle>Pomodoro</PageTitle>
@@ -7,7 +9,7 @@
 <h1>Pomodoro</h1>
 <div class="row">
     <div class="col-sm-12" align="center">
-        <h1 style="font-size: 5em;">@TimeLeft</h1>
+        @* <h1 style="font-size: 5em;">@AppState.TimeLeft</h1> *@
         <div class="col-sm-2" align="center">
             <div class="btn-group" role="group" aria-label="Basic example">
                 <button class="btn btn-primary" @onclick="Start" disabled="@PomodoroState.IsRunning">Start</button>
@@ -18,14 +20,16 @@
     </div>
 </div>
 
-<audio id="successPomodoro" src="mario_coin_sound.mp3" />
+@* <audio id="successPomodoro" src="mario_coin_sound.mp3" /> *@
 @code {
-    public string TimeLeft => TimeSpan.FromSeconds(PomodoroState.PomodoroTimerValue).ToString(@"mm\:ss");
+    [CascadingParameter] public AppState AppState { get; set; } = null!;
+
+    // public string TimeLeft => TimeSpan.FromSeconds(AppState.).ToString(@"mm\:ss");
     private System.Threading.Timer Timer;
 
     protected override async Task OnInitializedAsync()
     {
-        // PomodoroState.OnChange += StateHasChanged;
+        PomodoroState.OnChange += StateHasChanged;
         // PomodoroState.OnChangedSession += PlaySound;
         Timer = new System.Threading.Timer(_ =>
         {
@@ -52,8 +56,9 @@
     // Dispose all events
     public void Dispose()
     {
-        // PomodoroState.OnChange -= StateHasChanged;
+        PomodoroState.OnChange -= StateHasChanged;
         // PomodoroState.OnChangedSession -= PlaySound;
         Timer.Dispose();
     }
+
 }

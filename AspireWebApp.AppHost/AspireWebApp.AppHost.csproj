@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspireWebApp.ApiService\AspireWebApp.ApiService.csproj" />
     <ProjectReference Include="..\AspireWebApp.Web\AspireWebApp.Web.csproj" />
+    <ProjectReference Include="..\MassTransit\MassTransitDemo.csproj" />
     <ProjectReference Include="..\Todo.API\Todo.API.csproj" />
   </ItemGroup>
 

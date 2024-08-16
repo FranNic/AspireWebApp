@@ -1,7 +1,4 @@
 ﻿namespace AspireWebApp.Web.Components.Pages.Pomodoro;
-
-using System.ComponentModel;
-using Microsoft.AspNetCore.Components;
 using System.Timers;
 
 public class PomodoroState
@@ -13,8 +10,10 @@ public class PomodoroState
 
     public bool IsRunning
     { get { return PomodoroTimer.Enabled; } }
+
     public bool IsStopped
     { get { return !IsRunning; } }
+
     public PomodoroTimer PomodoroTimer { get; set; }
 
     private double? _PomodoroTimerValue;
@@ -25,7 +24,7 @@ public class PomodoroState
         private set
         {
             _PomodoroTimerValue = value;
-            //NotifyStateChanged();
+            NotifyStateChanged();
         }
     }
 
@@ -68,12 +67,12 @@ public class PomodoroState
         }
     }
 
-    //public event Action? OnChange;
+    public event Action? OnChange;
     //public event Action? OnChangedSession;
 
     // InvokeAsynk is used to notify the UI that the state has changed.
 
-    //private void NotifyStateChanged() => base.InvokeAsync(OnChange);
+    private void NotifyStateChanged() => OnChange?.Invoke();
 
     //private void NotifySessionChanged() => OnChangedSession?.Invoke();
 }

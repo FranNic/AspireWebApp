@@ -1,5 +1,6 @@
 using AspireWebApp.Web;
 using AspireWebApp.Web.Components;
+using AspireWebApp.Web.Components.Pages;
 using AspireWebApp.Web.Components.Pages.Pomodoro;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,11 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
-builder.Services.AddSingleton<PomodoroState>();
+builder.Services.AddScoped<PomodoroState>();
+builder.Services.AddSingleton<CounterState>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {
@@ -44,7 +47,8 @@ app.UseAntiforgery();
 app.UseOutputCache();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode();
 
 app.MapDefaultEndpoints();
 
