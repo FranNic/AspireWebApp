@@ -1,7 +1,9 @@
 ﻿@page "/pomodoro"
+@rendermode InteractiveServer
+
 @using AspireWebApp.Web.Components.Pages.Pomodoro
 @using Web.Components.Layout
-@rendermode InteractiveWebAssembly
+
 @inject PomodoroState PomodoroState
 
 <PageTitle>Pomodoro</PageTitle>
@@ -9,7 +11,10 @@
 <h1>Pomodoro</h1>
 <div class="row">
     <div class="col-sm-12" align="center">
-        @* <h1 style="font-size: 5em;">@AppState.TimeLeft</h1> *@
+        <h3 style="font-size: 5em;">
+            <PomodoroStateTimer ShowSession="false"/>
+        </h3>
+        <h6>Session: @PomodoroState.SessionIn</h6>
         <div class="col-sm-2" align="center">
             <div class="btn-group" role="group" aria-label="Basic example">
                 <button class="btn btn-primary" @onclick="Start" disabled="@PomodoroState.IsRunning">Start</button>
@@ -24,29 +29,18 @@
 @code {
     [CascadingParameter] public AppState AppState { get; set; } = null!;
 
-    // public string TimeLeft => TimeSpan.FromSeconds(AppState.).ToString(@"mm\:ss");
-    private System.Threading.Timer Timer;
+    private void Start() => PomodoroState.StartTimer();
+
+    private void Reset() => PomodoroState.InitializeTimer();
+
+    private void Stop() => PomodoroState.StopTimer();
 
     protected override async Task OnInitializedAsync()
     {
-        PomodoroState.OnChange += StateHasChanged;
-        // PomodoroState.OnChangedSession += PlaySound;
-        Timer = new System.Threading.Timer(_ =>
-        {
-            InvokeAsync(StateHasChanged);
-        }, null, 500, 500);
+        PomodoroState.OnChangedSession += PlaySound;
     }
 
-    private void Start() => PomodoroState.PomodoroTimer.Start();
-
-    private void Reset()
-    {
-        PomodoroState.PomodoroTimer.Dispose();
-        PomodoroState.InitializeTimer();
-    }
-
-    private void Stop() => PomodoroState.PomodoroTimer.Stop();
-
+    // Play sound when session changes
     private void PlaySound()
     {
         // JsRuntime.InvokeAsync<string>("PlaySound"); // this calls "window.PlaySound()"
@@ -56,9 +50,7 @@
     // Dispose all events
     public void Dispose()
     {
-        PomodoroState.OnChange -= StateHasChanged;
         // PomodoroState.OnChangedSession -= PlaySound;
-        Timer.Dispose();
     }
 
 }

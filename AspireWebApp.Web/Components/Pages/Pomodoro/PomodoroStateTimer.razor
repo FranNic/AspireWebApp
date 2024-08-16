@@ -1,0 +1,27 @@
+﻿@rendermode InteractiveServer
+@inject PomodoroState PomodoroState
+@implements IDisposable
+@inherits ComponentBase
+
+@if(ShowSession)
+{
+    <span> Session: @PomodoroState.SessionIn </span>
+}
+
+<span> @TimeLeft </span>
+
+@code {
+    [Parameter] public bool ShowSession { get; set; }
+
+    public string TimeLeft => TimeSpan.FromSeconds(PomodoroState.PomodoroTimeInSeconds).ToString(@"mm\:ss");
+
+    protected override void OnInitialized()
+    {
+        PomodoroState.OnChange += () => InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        PomodoroState.OnChange -= () => InvokeAsync(StateHasChanged);
+    }
+}

@@ -3,16 +3,16 @@
 @implements IDisposable
 @inherits ComponentBase
 
-<p role="status">Current count: @CounterState.Count</p>
+Current count: @CounterState.Count
 
 @code {
     protected override void OnInitialized()
     {
-        CounterState.OnChange += StateHasChanged;
+        CounterState.OnChange += () => InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        CounterState.OnChange -= StateHasChanged;
+        CounterState.OnChange -= () => InvokeAsync(StateHasChanged);
     }
 }

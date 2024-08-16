@@ -7,6 +7,22 @@ public class PomodoroState
     {
         InitializeTimer();
     }
+    public void InitializeTimer()
+    {
+        if (PomodoroTimer != null)
+        {
+            PomodoroTimer.Dispose();
+        }
+
+        PomodoroTimer = new PomodoroTimer(1000);
+        PomodoroTimer.Elapsed += UpdateTime;
+        NotifyStateChanged();
+    }
+
+    private PomodoroTimer PomodoroTimer { get; set; }
+
+    public Session SessionIn
+    { get { return PomodoroTimer.SessionIn; } }
 
     public bool IsRunning
     { get { return PomodoroTimer.Enabled; } }
@@ -14,34 +30,30 @@ public class PomodoroState
     public bool IsStopped
     { get { return !IsRunning; } }
 
-    public PomodoroTimer PomodoroTimer { get; set; }
-
-    private double? _PomodoroTimerValue;
-
-    public double PomodoroTimerValue
+    public double PomodoroTimeInSeconds
     {
-        get => _PomodoroTimerValue ?? 0;
-        private set
-        {
-            _PomodoroTimerValue = value;
-            NotifyStateChanged();
-        }
+        get => PomodoroTimer.TimeInSeconds;
     }
 
-    public void InitializeTimer()
+    public void StartTimer()
     {
-        PomodoroTimer = new PomodoroTimer();
-        PomodoroTimerValue = PomodoroTimer.TimeInSeconds;
-        PomodoroTimer.Elapsed += OnTimedEvent;
+        PomodoroTimer.Start();
+        Console.WriteLine("Timer started");
     }
 
-    private void OnTimedEvent(Object source, ElapsedEventArgs e)
+    public void StopTimer() {
+        PomodoroTimer.Stop();
+        Console.WriteLine("Timer stopped");
+    }
+
+    private void UpdateTime(Object source, ElapsedEventArgs e)
     {
-        PomodoroTimerValue = PomodoroTimer.DecreaseTime();
+        PomodoroTimer.DecreaseTime();
+        NotifyStateChanged();
 
         if (PomodoroTimer.TimeInSeconds <= 0)
         {
-            switch (PomodoroTimer.Status)
+            switch (PomodoroTimer.SessionIn)
             {
                 case Session.Work:
                     PomodoroTimer.StartBreak();
@@ -63,16 +75,16 @@ public class PomodoroState
                     break;
             }
 
-            //NotifySessionChanged();
+            NotifySessionChanged();
         }
     }
 
     public event Action? OnChange;
-    //public event Action? OnChangedSession;
+    public event Action? OnChangedSession;
 
     // InvokeAsynk is used to notify the UI that the state has changed.
 
     private void NotifyStateChanged() => OnChange?.Invoke();
 
-    //private void NotifySessionChanged() => OnChangedSession?.Invoke();
+    private void NotifySessionChanged() => OnChangedSession?.Invoke();
 }
