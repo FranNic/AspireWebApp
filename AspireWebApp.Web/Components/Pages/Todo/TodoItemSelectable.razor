@@ -1,0 +1,21 @@
+﻿@using global::Todo.Application.DTOs
+
+
+
+<li class="list-group-item (@TodoItem.Id == @SelectedItemId ? active : )" aria-current="true" @onclick="() => Select(TodoItem.Id)">@TodoItem.Title</li>
+
+
+
+@code {
+    [Parameter]
+    public TodoItemDto TodoItem { get; set; }
+
+
+    [Parameter]
+    public Guid? SelectedItemId { get; set; }
+
+    void Select(Guid id)
+    {
+        SelectedItemId = id;
+    }
+}

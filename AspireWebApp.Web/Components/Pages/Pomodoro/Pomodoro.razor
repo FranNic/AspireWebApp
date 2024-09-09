@@ -1,8 +1,6 @@
 ﻿@page "/pomodoro"
 @rendermode InteractiveServer
 
-@using AspireWebApp.Web.Components.Pages.Pomodoro
-@using Web.Components.Layout
 
 @inject PomodoroState PomodoroState
 
@@ -14,6 +12,7 @@
         <h3 style="font-size: 5em;">
             <PomodoroStateTimer ShowSession="false"/>
         </h3>
+        <h6>Current task: @SelectedItem</h6>
         <h6>Session: @PomodoroState.SessionIn</h6>
         <div class="col-sm-2" align="center">
             <div class="btn-group" role="group" aria-label="Basic example">
@@ -24,6 +23,8 @@
         </div>
     </div>
 </div>
+
+<TwoLevelList OnItemSelected="OnItemSelected" />
 
 @* <audio id="successPomodoro" src="mario_coin_sound.mp3" /> *@
 @code {
@@ -51,6 +52,14 @@
     public void Dispose()
     {
         // PomodoroState.OnChangedSession -= PlaySound;
+    }
+
+    private string SelectedItem { get; set; }
+
+    private void OnItemSelected(string itemId)
+    {
+        SelectedItem = itemId;
+        // Handle the selected item ID (e.g., update UI or fetch details)
     }
 
 }

@@ -82,8 +82,6 @@ public class PomodoroState
     public event Action? OnChange;
     public event Action? OnChangedSession;
 
-    // InvokeAsynk is used to notify the UI that the state has changed.
-
     private void NotifyStateChanged() => OnChange?.Invoke();
 
     private void NotifySessionChanged() => OnChangedSession?.Invoke();

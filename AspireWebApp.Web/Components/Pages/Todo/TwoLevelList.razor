@@ -1,0 +1,86 @@
+﻿@using global::Todo.Application.DTOs
+@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)]
+
+@inject TodoApiClient TodoApiClient
+
+<h3>TwoLevelList</h3>
+
+
+@if (todoLists == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <div class="row">
+        <!-- Tab Links -->
+        <div class="col-4">
+            <div class="list-group" id="list-tab" role="tablist">
+                @foreach (var list in todoLists)
+                {
+                    <a class="list-group-item list-group-item-action @(list.Id == SelectedListId ? "active" : "")"
+                       id="list-@list.Id-list"
+                       data-toggle="list"
+                       href="#list-@list.Id"
+                       role="tab"
+                       aria-controls="list-@list.Id">
+                        @list.Title
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="col-8">
+            <div class="tab-content" id="nav-tabContent">
+                @foreach (var list in todoLists)
+                {
+                    <div class="tab-pane fade @(list.Id == SelectedListId ? "show active" : "")"
+                         id="list-@list.Id"
+                         role="tabpanel"
+                         aria-labelledby="list-@list.Id-list">
+                        <ul class="list-group">
+                            @foreach (var item in list.Items)
+                            {
+                                <li class="list-group-item @(item.Title == @SelectedItemId ? " active" : "")" @onclick="() => HandleItemClick(item.Title)" style="cursor:pointer">@item.Title</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+
+    private TodoListDto[]? todoLists;
+    private Guid? SelectedListId { get; set; }
+    private string? SelectedItemId { get; set; }
+
+    [Parameter] public EventCallback<string> OnItemSelected { get; set; }
+
+    private void HandleItemClick(string itemId)
+    {
+        SelectedItemId = itemId;
+        OnItemSelected.InvokeAsync(itemId);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var enumerable = await TodoApiClient.GetTodoListsAsync();
+
+            todoLists = enumerable.ToArray();
+            SelectedListId = todoLists.FirstOrDefault()?.Id;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}

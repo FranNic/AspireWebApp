@@ -18,8 +18,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Application", "Todo.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransitDemo", "MassTransit\MassTransitDemo.csproj", "{CDA4FE48-A289-4ED4-ACB9-0F9B41A9FF02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp.Client", "WebApp\WebApp.Client\WebApp.Client.csproj", "{08664F1E-4A03-443B-94F4-1A5B5A6BB95E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireWebApp.Web", "AspireWebApp.Web\AspireWebApp.Web.csproj", "{3032EAE9-7FC6-4881-8988-D40FF2836D32}"
 EndProject
 Global
@@ -60,10 +58,6 @@ Global
 		{CDA4FE48-A289-4ED4-ACB9-0F9B41A9FF02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDA4FE48-A289-4ED4-ACB9-0F9B41A9FF02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDA4FE48-A289-4ED4-ACB9-0F9B41A9FF02}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08664F1E-4A03-443B-94F4-1A5B5A6BB95E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08664F1E-4A03-443B-94F4-1A5B5A6BB95E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08664F1E-4A03-443B-94F4-1A5B5A6BB95E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08664F1E-4A03-443B-94F4-1A5B5A6BB95E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3032EAE9-7FC6-4881-8988-D40FF2836D32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3032EAE9-7FC6-4881-8988-D40FF2836D32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3032EAE9-7FC6-4881-8988-D40FF2836D32}.Release|Any CPU.ActiveCfg = Release|Any CPU
