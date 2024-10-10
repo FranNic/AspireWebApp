@@ -2,13 +2,16 @@ using AspireWebApp.Web;
 using AspireWebApp.Web.Components;
 using AspireWebApp.Web.Components.Pages;
 using AspireWebApp.Web.Components.Pages.Pomodoro;
+using AspireWebApp.Web.Extensions;
+
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
-builder.Services.AddScoped<PomodoroState>();
+builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
 
 // Add services to the container.
@@ -28,6 +31,19 @@ builder.Services.AddHttpClient<TodoApiClient>(client =>
     // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
     // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
     client.BaseAddress = new("https+http://todo-api");
+});
+
+builder.Services.AddMassTransit(x =>
+{
+    x.SetKebabCaseEndpointNameFormatter();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var configuration = context.GetRequiredService<IConfiguration>();
+        var host = configuration.GetConnectionString("RabbitMQConnection");
+        cfg.Host(host);
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 var app = builder.Build();
