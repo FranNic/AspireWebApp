@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransitDemo", "MassTran
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus", "EventBus\EventBus.csproj", "{6D37802D-D27F-4008-A320-C395AAD6BE67}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireWebApp.Web", "AspireWebApp.Web\AspireWebApp.Web.csproj", "{4D1013E6-90A3-4486-AA00-53C73F0D6505}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{6D37802D-D27F-4008-A320-C395AAD6BE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D37802D-D27F-4008-A320-C395AAD6BE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D37802D-D27F-4008-A320-C395AAD6BE67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D1013E6-90A3-4486-AA00-53C73F0D6505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D1013E6-90A3-4486-AA00-53C73F0D6505}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D1013E6-90A3-4486-AA00-53C73F0D6505}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D1013E6-90A3-4486-AA00-53C73F0D6505}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
