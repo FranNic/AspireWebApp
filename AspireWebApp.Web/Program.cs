@@ -3,6 +3,7 @@ using AspireWebApp.Web.Components;
 using AspireWebApp.Web.Components.Pages;
 using AspireWebApp.Web.Components.Pages.Pomodoro;
 using AspireWebApp.Web.Extensions;
+using AspireWebApp.Web.Services.Toast;
 
 using MassTransit;
 
@@ -13,6 +14,7 @@ builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
 builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
+builder.Services.AddSingleton<ToastNotificationService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
