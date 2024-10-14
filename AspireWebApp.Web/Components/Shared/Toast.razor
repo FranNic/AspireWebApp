@@ -1,16 +1,17 @@
 ﻿@using AspireWebApp.Web.Services.Toast
+@using static AspireWebApp.Web.Services.Toast.ToastNotificationService
 @inject ToastNotificationService ToastNotificationService
 @rendermode RenderMode.InteractiveServer
 
-@if (ShowMessage)
-{
-    <div class="toast-message-container">
-        <div class="toast-message-box @MessageTypeClass">
-            <span class="toast-message-content">@MessageContent</span>
-            <button class="toast-close-button" @onclick="HideMessage">x</button>
+<div class="toast-message-container">
+    @foreach (var toast in ToastNotificationService.ToastMessages)
+    {
+        <div class="toast-message-box @MessageTypeClass" @key="toast.Id">
+            <span class="toast-message-content">@toast.MessageContent</span>
+            <button class="toast-close-button" @onclick="() => HideMessage(toast.Id)">x</button>
         </div>
-    </div>
-}
+    }
+</div>
 @code {
     private bool ShowMessage { get; set; } = false;
     private string MessageContent { get; set; } = string.Empty;
@@ -34,9 +35,14 @@
     }
     protected override void OnInitialized()
     {
-        ToastNotificationService.OnShow += ShowToast;
-        ToastNotificationService.OnHide += HideMessage;
+        ToastNotificationService.OnShoww += ShowToast;
+        ToastNotificationService.OnHidee += HideMessage;
     }
+    private async void ShowToast(ToastMessage toastMessage)
+    {
+        this.ShowToast(toastMessage.MessageContent, toastMessage.MessageType, toastMessage.DismissAfter);
+    }
+
     private async void ShowToast(string message, string type, int dismissAfter)
     {
         MessageContent = message;
@@ -49,6 +55,12 @@
             HideMessage();
         }
     }
+    private void HideMessage(Guid id)
+    {
+        ToastNotificationService.RemoveToast(id);
+        InvokeAsync(StateHasChanged); // Ensure the UI updates
+    }
+
     private void HideMessage()
     {
         ShowMessage = false;
@@ -56,7 +68,7 @@
     }
     public void Dispose()
     {
-        ToastNotificationService.OnShow -= ShowToast;
-        ToastNotificationService.OnHide -= HideMessage;
+        ToastNotificationService.OnShoww -= ShowToast;
+        ToastNotificationService.OnHidee -= HideMessage;
     }
 }
