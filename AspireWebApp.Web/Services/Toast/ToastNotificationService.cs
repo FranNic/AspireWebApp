@@ -1,17 +1,13 @@
 ﻿namespace AspireWebApp.Web.Services.Toast;
 public class ToastNotificationService
 {
-    public event Action<string, string, int> OnShow;
-    public event Action<ToastMessage>? OnShoww;
-    public event Action OnHide;
-    public event Action<Guid>? OnHidee;
-    //public void ShowToast(string message, string type = "info", int dismissAfter = 3)
-    //{
-    //    OnShow?.Invoke(message, type, dismissAfter);
-    //}
-    public void HideToast()
+    public List<ToastMessage> ToastMessages { get; set; } = new();
+    public event Action<ToastMessage>? OnShow;
+    public event Action<Guid>? OnHide;
+
+    public void HideToast(Guid id)
     {
-        OnHide?.Invoke();
+        OnHide?.Invoke(id);
     }
     public void ShowSuccess(string message, int dismissAfter = 3) => ShowToast(message, "success", dismissAfter);
     public void ShowError(string message, int dismissAfter = 3) => ShowToast(message, "failure", dismissAfter);
@@ -20,21 +16,12 @@ public class ToastNotificationService
     public void ShowAlert(string message, int dismissAfter = 3) => ShowToast(message, "alert", dismissAfter);
 
 
-    public List<ToastMessage> ToastMessages { get; set; } = new();
-
-   
 
     public void ShowToast(string message, string type = "info", int dismissAfter = 3)
     {
-        var toast = new ToastMessage
-        {
-            Id = Guid.NewGuid(),
-            MessageContent = message,
-            MessageType = type,
-            DismissAfter = dismissAfter
-        };
+        var toast = new ToastMessage(message, type, dismissAfter);
         ToastMessages.Add(toast);
-        OnShoww?.Invoke(toast);
+        OnShow?.Invoke(toast);
 
         Task.Delay(dismissAfter * 1000).ContinueWith(_ => RemoveToast(toast.Id));
     }
@@ -45,16 +32,33 @@ public class ToastNotificationService
         if (toastToRemove != null)
         {
             ToastMessages.Remove(toastToRemove);
-            OnHidee?.Invoke(id);
+            OnHide?.Invoke(id);
         }
     }
 
-    public class ToastMessage
+    public record ToastMessage
     {
-        public Guid Id { get; set; }
+        public ToastMessage(string messageContent, string messageType, int dismissAfter)
+        {
+            Id = Guid.NewGuid();
+            MessageContent = messageContent;
+            MessageType = messageType;
+            DismissAfter = dismissAfter;
+        }
+
+        public Guid Id { init; get; }
         public string MessageContent { get; set; }
         public string MessageType { get; set; }
         public int DismissAfter { get; set; }
+
+        public string MessageTypeClass => MessageType switch
+        {
+            "success" => "toast-message-success",
+            "failure" => "toast-message-failure",
+            "alert" => "toast-message-alert",
+            "warning" => "toast-message-warning",
+            _ => "toast-message-default"
+        };
     }
 
 }

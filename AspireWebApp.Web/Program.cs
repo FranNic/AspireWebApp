@@ -14,7 +14,7 @@ builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
 builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
-builder.Services.AddSingleton<ToastNotificationService>();
+builder.Services.AddScoped<ToastNotificationService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

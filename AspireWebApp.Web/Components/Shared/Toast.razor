@@ -4,71 +4,36 @@
 @rendermode RenderMode.InteractiveServer
 
 <div class="toast-message-container">
-    @foreach (var toast in ToastNotificationService.ToastMessages)
+    @foreach (var toast in ToastNotificationService.ToastMessages.ToList())
     {
-        <div class="toast-message-box @MessageTypeClass" @key="toast.Id">
+        <div class="toast-message-box @toast.MessageTypeClass" @key="toast.Id">
             <span class="toast-message-content">@toast.MessageContent</span>
             <button class="toast-close-button" @onclick="() => HideMessage(toast.Id)">x</button>
         </div>
     }
 </div>
 @code {
-    private bool ShowMessage { get; set; } = false;
-    private string MessageContent { get; set; } = string.Empty;
-    private string MessageType { get; set; } = "success"; // default to success
-    public int DismissAfter { get; set; } = 3;
-    private string MessageTypeClass => MessageType switch
-    {
-        "success" => "toast-message-success",
-        "failure" => "toast-message-failure",
-        "alert" => "toast-message-alert",
-        "warning" => "toast-message-warning",
-        _ => "toast-message-default"
-    };
-    protected override async Task OnParametersSetAsync()
-    {
-        if (ShowMessage && DismissAfter > 0)
-        {
-            await Task.Delay(DismissAfter * 1000);
-            HideMessage();
-        }
-    }
+ 
     protected override void OnInitialized()
     {
-        ToastNotificationService.OnShoww += ShowToast;
-        ToastNotificationService.OnHidee += HideMessage;
-    }
-    private async void ShowToast(ToastMessage toastMessage)
-    {
-        this.ShowToast(toastMessage.MessageContent, toastMessage.MessageType, toastMessage.DismissAfter);
+        ToastNotificationService.OnShow += ShowToast;
+        ToastNotificationService.OnHide += HideMessage;
     }
 
-    private async void ShowToast(string message, string type, int dismissAfter)
+    private async void ShowToast(ToastMessage toastMessage)
     {
-        MessageContent = message;
-        MessageType = type;
-        ShowMessage = true;
         await InvokeAsync(StateHasChanged); // Ensure the UI updates
-        if (dismissAfter > 0)
-        {
-            await Task.Delay(dismissAfter * 1000);
-            HideMessage();
-        }
     }
+
     private void HideMessage(Guid id)
     {
         ToastNotificationService.RemoveToast(id);
-        InvokeAsync(StateHasChanged); // Ensure the UI updates
+        InvokeAsync(StateHasChanged);
     }
 
-    private void HideMessage()
-    {
-        ShowMessage = false;
-        InvokeAsync(StateHasChanged); // Ensure the UI updates
-    }
     public void Dispose()
     {
-        ToastNotificationService.OnShoww -= ShowToast;
-        ToastNotificationService.OnHidee -= HideMessage;
+        ToastNotificationService.OnShow -= ShowToast;
+        ToastNotificationService.OnHide -= HideMessage;
     }
 }
