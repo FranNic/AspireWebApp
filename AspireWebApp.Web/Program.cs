@@ -3,6 +3,7 @@ using AspireWebApp.Web.Components;
 using AspireWebApp.Web.Components.Pages;
 using AspireWebApp.Web.Components.Pages.Pomodoro;
 using AspireWebApp.Web.Extensions;
+using AspireWebApp.Web.Services.NotificationConsumer;
 using AspireWebApp.Web.Services.Toast;
 
 using MassTransit;
@@ -14,7 +15,7 @@ builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
 builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
-builder.Services.AddScoped<ToastNotificationService>();
+builder.Services.AddSingleton<ToastNotificationService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -37,10 +38,13 @@ builder.Services.AddHttpClient<TodoApiClient>(client =>
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<NotificationConsumer>();
+
     x.SetKebabCaseEndpointNameFormatter();
 
     x.UsingRabbitMq((context, cfg) =>
     {
+
         var configuration = context.GetRequiredService<IConfiguration>();
         var host = configuration.GetConnectionString("RabbitMQConnection");
         cfg.Host(host);

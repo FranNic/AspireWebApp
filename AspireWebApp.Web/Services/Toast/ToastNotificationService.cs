@@ -1,32 +1,41 @@
 ﻿namespace AspireWebApp.Web.Services.Toast;
-public class ToastNotificationService
+
+public class ToastNotificationService : IToastNotificationService
 {
     public List<ToastMessage> ToastMessages { get; set; } = new();
+
     public event Action<ToastMessage>? OnShow;
+
     public event Action<Guid>? OnHide;
 
-    public void HideToast(Guid id)
+    public Task HideToast(Guid id)
     {
         OnHide?.Invoke(id);
+        return Task.CompletedTask;
     }
-    public void ShowSuccess(string message, int dismissAfter = 3) => ShowToast(message, "success", dismissAfter);
-    public void ShowError(string message, int dismissAfter = 3) => ShowToast(message, "failure", dismissAfter);
-    public void ShowWarning(string message, int dismissAfter = 3) => ShowToast(message, "warning", dismissAfter);
-    public void ShowInfo(string message, int dismissAfter = 3) => ShowToast(message, "info", dismissAfter);
-    public void ShowAlert(string message, int dismissAfter = 3) => ShowToast(message, "alert", dismissAfter);
 
+    public Task ShowSuccess(string message, int dismissAfter = 3) => ShowToast(message, "success", dismissAfter);
 
+    public Task ShowError(string message, int dismissAfter = 3) => ShowToast(message, "failure", dismissAfter);
 
-    public void ShowToast(string message, string type = "info", int dismissAfter = 3)
+    public Task ShowWarning(string message, int dismissAfter = 3) => ShowToast(message, "warning", dismissAfter);
+
+    public Task ShowInfo(string message, int dismissAfter = 3) => ShowToast(message, "info", dismissAfter);
+
+    public Task ShowAlert(string message, int dismissAfter = 3) => ShowToast(message, "alert", dismissAfter);
+
+    public Task ShowToast(string message, string type = "info", int dismissAfter = 3)
     {
         var toast = new ToastMessage(message, type, dismissAfter);
         ToastMessages.Add(toast);
         OnShow?.Invoke(toast);
 
         Task.Delay(dismissAfter * 1000).ContinueWith(_ => RemoveToast(toast.Id));
+
+        return Task.CompletedTask;
     }
 
-    public void RemoveToast(Guid id)
+    public Task RemoveToast(Guid id)
     {
         var toastToRemove = ToastMessages.FirstOrDefault(t => t.Id == id);
         if (toastToRemove != null)
@@ -34,6 +43,7 @@ public class ToastNotificationService
             ToastMessages.Remove(toastToRemove);
             OnHide?.Invoke(id);
         }
+        return Task.CompletedTask;
     }
 
     public record ToastMessage
@@ -60,5 +70,4 @@ public class ToastNotificationService
             _ => "toast-message-default"
         };
     }
-
 }
