@@ -9,7 +9,8 @@ var messaging = builder.AddRabbitMQ("RabbitMQConnection");
 var apiService = builder.AddProject<Projects.AspireWebApp_ApiService>("apiservice");
 
 var todoApi = builder.AddProject<Projects.Todo_API>("todo-api")
-                            .WithReference(sql);
+                        .WithReference(messaging)
+                        .WithReference(sql);
 
 builder.AddProject<Projects.MassTransitDemo>("masstransitdemo")
     .WithReference(messaging);

@@ -1,8 +1,7 @@
 ﻿namespace Todo.Infrastructure.Services;
 
 using System;
-
-using Todo.Application;
+using Todo.Application.Common.Interfaces;
 
 public class DateTimeService : IDateTime
 {

@@ -12,10 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
-builder.AddRedisOutputCache("cache");
+//builder.AddRedisOutputCache("cache");
 builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
 builder.Services.AddSingleton<ToastNotificationService>();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -44,9 +45,8 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-
-        var configuration = context.GetRequiredService<IConfiguration>();
-        var host = configuration.GetConnectionString("RabbitMQConnection");
+        IConfiguration configuration = context.GetRequiredService<IConfiguration>();
+        string? host = configuration.GetConnectionString("RabbitMQConnection");
         cfg.Host(host);
         cfg.ConfigureEndpoints(context);
     });
@@ -66,7 +66,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.UseOutputCache();
+//app.UseOutputCache();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
