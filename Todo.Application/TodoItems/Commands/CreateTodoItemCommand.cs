@@ -33,7 +33,7 @@ public class CreateTodoItemCommand : IRequest<TodoItemDto>
 
         public async Task<TodoItemDto> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
         {
-            var entity = new TodoItem
+            TodoItem entity = new TodoItem
             {
                 Title = request.Title,
                 Description = request.Description,

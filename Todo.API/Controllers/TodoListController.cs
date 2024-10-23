@@ -1,10 +1,14 @@
 namespace Todo.API.Controllers;
 
+using MediatR;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using Todo.Application.DTOs;
 using Todo.Application.Mappers;
+using Todo.Application.TodoLists.Commands;
+using Todo.Domain;
 using Todo.Infrastructure.Persistence;
 
 [ApiController]
@@ -12,12 +16,14 @@ using Todo.Infrastructure.Persistence;
 public class TodoListController : ControllerBase
 {
     private readonly ILogger<TodoListController> _logger;
+    private readonly IMediator _mediator;
     private readonly TodoDbContext _dbContext;
 
-    public TodoListController(ILogger<TodoListController> logger, TodoDbContext todoContext)
+    public TodoListController(ILogger<TodoListController> logger, TodoDbContext todoContext, IMediator mediator)
     {
         _logger = logger;
         _dbContext = todoContext;
+        this._mediator = mediator;
     }
 
     [HttpGet(Name = "GetAll")]
@@ -29,7 +35,7 @@ public class TodoListController : ControllerBase
     [HttpGet("{id}", Name = "GetById")]
     public async Task<ActionResult<TodoListDto>> GetById(Guid id)
     {
-        var todoList = await _dbContext.TodoLists.AsNoTracking().Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == id);
+        TodoList todoList = await _dbContext.TodoLists.AsNoTracking().Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == id);
 
         if (todoList == null)
         {
@@ -37,5 +43,18 @@ public class TodoListController : ControllerBase
         }
 
         return todoList.ToDto();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<TodoListDto>> Post(TodoListDto todoListDto)
+    {
+        CreateTodoListCommand command = new CreateTodoListCommand
+        {
+            Title = todoListDto.Title
+        };
+
+        TodoListDto todoList = await _mediator.Send(command);
+
+        return CreatedAtRoute("GetById", new { id = todoList.Id }, todoList);
     }
 }
