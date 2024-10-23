@@ -59,13 +59,13 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todoitem = await _dbContext.TodoItems.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            if (todoitem == null)
+            TodoItem? todoItem = await _dbContext.TodoItems.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (todoItem == null)
             {
                 return NotFound();
             }
 
-            return Ok(todoitem.ToDto());
+            return Ok(todoItem.ToDto());
         }
         catch (Exception ex)
         {
@@ -79,7 +79,7 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
+            TodoItem todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
             if (todoitemToUpdate == null)
             {
                 return NotFound();
@@ -104,7 +104,7 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
+            TodoItem todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
             if (todoitemToUpdate == null)
             {
                 return NotFound();
