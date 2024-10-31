@@ -1,0 +1,28 @@
+﻿@page "/geolocation"
+@using Darnton.Blazor.DeviceInterop.Geolocation
+@inject IGeolocationService GeolocationService
+@rendermode InteractiveServer
+
+<h3>GeoLocation</h3>
+
+<button class="btn btn-primary" @onclick="GetLocation">Get Location</button>
+
+@if(location == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>Latitude: @location.Position.Coords.Latitude</p>
+    <p>Longitude: @location.Position.Coords.Longitude</p>
+}
+
+
+@code {
+    GeolocationResult? location;
+    private async Task GetLocation()
+    {
+        location = await GeolocationService.GetCurrentPosition();
+        Console.WriteLine($"Latitude: {location.Position.Coords.Latitude}, Longitude: {location.Position.Coords.Longitude}");
+    }
+}

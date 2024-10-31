@@ -6,16 +6,20 @@ using AspireWebApp.Web.Extensions;
 using AspireWebApp.Web.Services.NotificationConsumer;
 using AspireWebApp.Web.Services.Toast;
 
+using Darnton.Blazor.DeviceInterop.Geolocation;
+
 using MassTransit;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 //builder.AddRedisOutputCache("cache");
+
 builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
 builder.Services.AddSingleton<ToastNotificationService>();
+builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 
 
 // Add services to the container.
@@ -52,7 +56,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
