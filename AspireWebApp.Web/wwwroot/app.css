@@ -1,4 +1,4 @@
-h1:focus {
+﻿h1:focus {
     outline: none;
 }
 
@@ -104,4 +104,15 @@ h1:focus {
         transform: translateX(100%);
         opacity: 0;
     }
+}
+
+/*GEo*/
+div#geolocationPointMap {
+    height: 450px;
+    width: 100%;
+}
+
+div#geolocationWatchMap {
+    height: 450px;
+    width: 100%;
 }
