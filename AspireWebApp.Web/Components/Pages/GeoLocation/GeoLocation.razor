@@ -49,17 +49,6 @@
 
 
 @code {
-    GeolocationResult? location;
-    private async Task GetLocation()
-    {
-        location = await GeolocationService.GetCurrentPosition();
-        Console.WriteLine($"Latitude: {location.Position.Coords.Latitude}, Longitude: {location.Position.Coords.Longitude}");
-    }
-
-    ///// <summary>
-    ///
-    /// </summary>
-
     protected Map PositionMap;
     protected TileLayer PositionTileLayer;
     protected Marker CurrentPositionMarker;
