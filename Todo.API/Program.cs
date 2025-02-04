@@ -1,3 +1,5 @@
+using MassTransit;
+
 using Microsoft.EntityFrameworkCore;
 
 using Todo.Application;
@@ -12,6 +14,20 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add services to the container.
+builder.Services.AddMassTransit(x =>
+{
+    x.SetKebabCaseEndpointNameFormatter();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var configuration = context.GetRequiredService<IConfiguration>();
+        var host = configuration.GetConnectionString("RabbitMQConnection");
+        cfg.Host(host);
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

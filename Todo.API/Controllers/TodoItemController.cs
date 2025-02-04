@@ -1,5 +1,7 @@
 ﻿namespace Todo.API.Controllers;
 
+using MediatR;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +9,7 @@ using System;
 
 using Todo.Application.DTOs;
 using Todo.Application.Mappers;
+using Todo.Application.TodoItems.Commands;
 using Todo.Domain;
 using Todo.Infrastructure.Persistence;
 
@@ -16,11 +19,13 @@ public class TodoItemController : ControllerBase
 {
     private readonly TodoDbContext _dbContext;
     private readonly ILogger<TodoItemController> _logger;
+    private readonly IMediator _mediator;
 
-    public TodoItemController(TodoDbContext dbContext, ILogger<TodoItemController> logger)
+    public TodoItemController(TodoDbContext dbContext, ILogger<TodoItemController> logger, IMediator mediator)
     {
         this._dbContext = dbContext;
         this._logger = logger;
+        this._mediator = mediator;
     }
 
     [HttpPost]
@@ -28,23 +33,19 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todolist = await _dbContext.TodoLists.AsNoTracking().FirstOrDefaultAsync(x => x.Id == todolistId);
+            TodoList? todolist = await _dbContext.TodoLists.AsNoTracking().FirstOrDefaultAsync(x => x.Id == todolistId);
             if (todolist == null)
             {
                 return NotFound();
             }
-            var item = new TodoItem
+
+            TodoItemDto item = await _mediator.Send(new CreateTodoItemCommand
             {
                 Title = newItem.Title,
-                Description = newItem.Title,
-                Id = Guid.NewGuid(),
+                Description = newItem.Description,
                 ListId = todolistId
-            };
+            });
 
-            _dbContext.TodoItems.Add(item);
-
-            await _dbContext.SaveChangesAsync();
-            // return created
             return Created("GetById", item);
         }
         catch (Exception ex)
@@ -58,13 +59,13 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todoitem = await _dbContext.TodoItems.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            if (todoitem == null)
+            TodoItem? todoItem = await _dbContext.TodoItems.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (todoItem == null)
             {
                 return NotFound();
             }
 
-            return Ok(todoitem.ToDto());
+            return Ok(todoItem.ToDto());
         }
         catch (Exception ex)
         {
@@ -78,7 +79,7 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
+            TodoItem todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
             if (todoitemToUpdate == null)
             {
                 return NotFound();
@@ -103,7 +104,7 @@ public class TodoItemController : ControllerBase
     {
         try
         {
-            var todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
+            TodoItem todoitemToUpdate = _dbContext.TodoItems.Single(x => x.Id == todoId);
             if (todoitemToUpdate == null)
             {
                 return NotFound();

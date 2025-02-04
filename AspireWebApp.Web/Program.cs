@@ -2,14 +2,25 @@ using AspireWebApp.Web;
 using AspireWebApp.Web.Components;
 using AspireWebApp.Web.Components.Pages;
 using AspireWebApp.Web.Components.Pages.Pomodoro;
+using AspireWebApp.Web.Extensions;
+using AspireWebApp.Web.Services.NotificationConsumer;
+using AspireWebApp.Web.Services.Toast;
 
-var builder = WebApplication.CreateBuilder(args);
+using Darnton.Blazor.DeviceInterop.Geolocation;
+
+using MassTransit;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
-builder.AddRedisOutputCache("cache");
-builder.Services.AddScoped<PomodoroState>();
+//builder.AddRedisOutputCache("cache");
+
+builder.Services.AddSingleton<PomodoroState>();
 builder.Services.AddSingleton<CounterState>();
+builder.Services.AddSingleton<ToastNotificationService>();
+builder.Services.AddScoped<IGeolocationService, GeolocationService>();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -30,7 +41,22 @@ builder.Services.AddHttpClient<TodoApiClient>(client =>
     client.BaseAddress = new("https+http://todo-api");
 });
 
-var app = builder.Build();
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<NotificationConsumer>();
+
+    x.SetKebabCaseEndpointNameFormatter();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        IConfiguration configuration = context.GetRequiredService<IConfiguration>();
+        string? host = configuration.GetConnectionString("RabbitMQConnection");
+        cfg.Host(host);
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
+WebApplication app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -44,7 +70,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.UseOutputCache();
+//app.UseOutputCache();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

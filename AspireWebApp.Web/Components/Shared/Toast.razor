@@ -1,0 +1,39 @@
+﻿@using AspireWebApp.Web.Services.Toast
+@using static AspireWebApp.Web.Services.Toast.ToastNotificationService
+@inject ToastNotificationService ToastNotificationService
+@rendermode RenderMode.InteractiveServer
+
+<div class="toast-message-container">
+    @foreach (var toast in ToastNotificationService.ToastMessages.ToList())
+    {
+        <div class="toast-message-box @toast.MessageTypeClass" @key="toast.Id">
+            <span class="toast-message-content">@toast.MessageContent</span>
+            <button class="toast-close-button" @onclick="() => HideMessage(toast.Id)">x</button>
+        </div>
+    }
+</div>
+@code {
+ 
+    protected override void OnInitialized()
+    {
+        ToastNotificationService.OnShow += ShowToast;
+        ToastNotificationService.OnHide += HideMessage;
+    }
+
+    private async void ShowToast(ToastMessage toastMessage)
+    {
+        await InvokeAsync(StateHasChanged); // Ensure the UI updates
+    }
+
+    private void HideMessage(Guid id)
+    {
+        ToastNotificationService.RemoveToast(id);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ToastNotificationService.OnShow -= ShowToast;
+        ToastNotificationService.OnHide -= HideMessage;
+    }
+}

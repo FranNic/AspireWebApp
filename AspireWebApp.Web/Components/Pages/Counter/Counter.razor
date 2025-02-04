@@ -3,6 +3,8 @@
 @inject CounterState CounterState
 @implements IDisposable
 @inherits ComponentBase
+@* @inject ICounterNotificationService CounterNotificationService *@
+
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
@@ -15,6 +17,7 @@
     private void IncrementCount()
     {
         CounterState.IncrementCount();
+        // _ = CounterNotificationService.SendCounterIncrementedEvent();
     }
 
     protected override void OnInitialized()

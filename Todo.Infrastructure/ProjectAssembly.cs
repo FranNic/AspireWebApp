@@ -5,8 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using System.Reflection;
-
-using Todo.Application;
+using Todo.Application.Common.Interfaces;
 using Todo.Infrastructure.Persistence;
 using Todo.Infrastructure.Services;
 

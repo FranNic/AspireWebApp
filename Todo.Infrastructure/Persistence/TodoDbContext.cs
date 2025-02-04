@@ -3,8 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using System.Reflection;
-
-using Todo.Application;
+using Todo.Application.Common.Interfaces;
 using Todo.Domain;
 
 public class TodoDbContext : DbContext, ITodoDbContext

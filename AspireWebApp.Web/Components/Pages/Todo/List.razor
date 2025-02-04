@@ -102,7 +102,7 @@ else
         TodoItemToAdd.Description = TodoItemToAdd.Title;
 
         // call the api
-        await TodoApiClient.AddTodoItemAsync(todoList.Id, TodoItemToAdd);
+        await TodoApiClient.CreateTodoItemAsync(todoList.Id, TodoItemToAdd);
 
         // Clear the task name
         taskName = null;

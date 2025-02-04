@@ -1,9 +1,53 @@
 ﻿@page "/"
+@using EventBus.Events
+@using MassTransit
+@using AspireWebApp.Web.Services.Toast
+@using AspireWebApp.Web.Components.Shared
 @inject CounterState CounterState
+@inject IBus Bus
+@inject ToastNotificationService ToastNotificationService
+@rendermode InteractiveServer
 <PageTitle>Home</PageTitle>
-
 <h1>Hello, world!</h1>
+<p>Current count: @CounterState.Count</p>
 
 Welcome to your new app.
+<button class="btn btn-primary mt-4" @onclick="DispatchMessage">Publish Hello, world!</button>
+<h3>Toast Service Demo</h3>
 
-<p>Current count: @CounterState.Count</p>
+<button class="btn btn-success" @onclick="ShowSuccessToast">Show Success Toast</button>
+<button class="btn btn-danger" @onclick="ShowFailureToast">Show Failure Toast</button>
+<button class="btn" @onclick="ShowAlertToast">Show Alert Toast</button>
+<button class="btn btn-warning" @onclick="ShowWarningToast">Show Warning Toast</button>
+
+@code {
+    private void ShowSuccessToast()
+    {
+        ToastNotificationService.ShowSuccess("Operation Successful!", 5);
+    }
+
+    private void ShowFailureToast()
+    {
+        ToastNotificationService.ShowError("This is a failure message!", 5);
+    }
+
+    private void ShowAlertToast()
+    {
+        ToastNotificationService.ShowAlert("This is an alert message!", 5);
+    }
+
+    private void ShowWarningToast()
+    {
+        ToastNotificationService.ShowWarning("This is an alert message!", 5);
+    }
+    private async Task DispatchMessage()
+    {
+        Console.WriteLine("Message published");
+
+        await Bus.Publish(new IntegrationEvent
+            {   
+                Message = "Hello, world!"
+            });
+
+    }
+}
