@@ -10,6 +10,8 @@ using Darnton.Blazor.DeviceInterop.Geolocation;
 
 using MassTransit;
 
+using MudBlazor.Services;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
@@ -26,6 +28,8 @@ builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddMudServices();
 
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {

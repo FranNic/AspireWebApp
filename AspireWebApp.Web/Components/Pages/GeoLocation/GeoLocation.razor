@@ -74,29 +74,29 @@
     protected override async Task OnInitializedAsync()
     {
         PositionMap = new Map("geolocationPointMap", new MapOptions //Centred on Spain
-        {
-            Center = new LatLng(40, -3),
-            Zoom = MapZoomLevel.City.ToInt()
-        });
+            {
+                Center = new LatLng(40, -3),
+                Zoom = MapZoomLevel.City.ToInt()
+            });
         PositionTileLayer = new TileLayer(
             "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
             new TileLayerOptions
                 {
                     Attribution = @"Map data &copy; <a href=""https://www.openstreetmap.org/"">OpenStreetMap</a> contributors, " +
-                            @"<a href=""https://creativecommons.org/licenses/by-sa/2.0/"">CC-BY-SA</a>"
+                                @"<a href=""https://creativecommons.org/licenses/by-sa/2.0/"">CC-BY-SA</a>"
                 }
         );
         WatchMap = new Map("geolocationWatchMap", new MapOptions //Centred on Spain
-        {
-            Center = new LatLng(40, -3),
-            Zoom = MapZoomLevel.Country.ToInt()
-        });
+            {
+                Center = new LatLng(40, -3),
+                Zoom = MapZoomLevel.Country.ToInt()
+            });
         WatchTileLayer = new TileLayer(
             "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
             new TileLayerOptions
                 {
                     Attribution = @"Map data &copy; <a href=""https://www.openstreetmap.org/"">OpenStreetMap</a> contributors, " +
-                            @"<a href=""https://creativecommons.org/licenses/by-sa/2.0/"">CC-BY-SA</a>"
+                                @"<a href=""https://creativecommons.org/licenses/by-sa/2.0/"">CC-BY-SA</a>"
                 }
         );
     }
@@ -110,10 +110,10 @@
         CurrentPositionResult = await GeolocationService.GetCurrentPosition();
         if (CurrentPositionResult.IsSuccess)
         {
-            CurrentPositionMarker = new Marker(
-                    CurrentPositionResult.Position.ToLeafletLatLng(), null
-                );
+            CurrentPositionMarker = new Marker(CurrentPositionResult.Position.ToLeafletLatLng(), null);
             await CurrentPositionMarker.AddTo(PositionMap);
+            await this.PositionMap.SetView(CurrentPositionResult.Position.ToLeafletLatLng(), zoom: MapZoomLevel.Country.ToInt());
+
         }
         StateHasChanged();
     }
@@ -136,6 +136,8 @@
         {
             GeolocationService.WatchPositionReceived += HandleWatchPositionReceived;
             WatchHandlerId = await GeolocationService.WatchPosition();
+            await this.WatchMap.SetView(CurrentPositionResult.Position.ToLeafletLatLng(), zoom: MapZoomLevel.Country.ToInt());
+
         }
         StateHasChanged();
     }

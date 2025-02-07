@@ -9,39 +9,120 @@
 
 @rendermode InteractiveServer
 
-
-<h3>Todo</h3>
-
 @if (todoLists == null)
 {
     <p><em>Loading...</em></p>
+
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Items</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var todoList in todoLists)
-            {
-                <tr>
-                    <td>@todoList.Title</td>
-                    <td>@todoList.Items.Count</td>
-                    <td><a class="btn btn-primary" href="@ItemHelper.TodoListUrl(todoList)">View</a></td>
-                    <td><a class="btn btn-primary" href="@ItemHelper.TodoListUrl(todoList)">Delete</a></td>
-                </tr>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-3 mb-lg-5">
+                <div class="position-relative card table-nowrap table-card">
+                    <div class="card-header align-items-center">
+                        <h5 class="mb-0">ToDo Lists</h5>
+                        <p class="mb-0 small text-muted">1 Pending</p>
+                        <div class="position-absolute top-0 end-0 mt-3 me-3">
+                            @* <button class="btn btn-primary" @onclick="() => OnShowModalClick()">Add</button> *@
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead class="small text-uppercase bg-body text-muted">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Title</th>
+                                        <th>Items</th>
+                                        <th colspan="2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (index, todoList) in todoLists.Select((item, index) => (index, item)))
+                                    {
+                                        <tr>
+                                            <td>index</td>
+                                            <td>@todoList.Title</td>
+                                            <td>@todoList.Items.Count</td>
+                                            <td><a class="btn btn-primary" href="@ItemHelper.TodoListUrl(todoList)">View</a></td>
+                                            <td><a class="btn btn-primary" href="@ItemHelper.TodoListUrl(todoList)">Delete</a></td>
+                                        </tr>
+                                    }
+                                    <tr class="align-middle">
+                                        <td>
+                                            #57473829
+                                        </td>
+                                        <td>13 Sep, 2021</td>
+                                        <td>Renee Sims</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span><i class="fa fa-arrow-up" aria-hidden="true"></i></span>
+                                                <span>$145</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge fs-6 fw-normal bg-tint-success text-success">Completed</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer text-end">
+                            <a href="#!" class="btn btn-gray">View All Transactions</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .card {
+                box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
             }
-        </tbody>
-    </table>
-    <TodoListCreate Busy="Busy"
-                    TodoListDto="newTodoList"
-                    IsAdd="true"
-                    CancelRequest="Cancel"
-                    ValidationResult="@(async (success) => await HandleSubmitAsync(success))" />
+
+            .avatar.sm {
+                width: 2.25rem;
+                height: 2.25rem;
+                font-size: .818125rem;
+            }
+
+            .table-nowrap .table td,
+            .table-nowrap .table th {
+                white-space: nowrap;
+            }
+
+            .table > :not(caption) > * > * {
+                padding: 0.75rem 1.25rem;
+                border-bottom-width: 1px;
+            }
+
+            table th {
+                font-weight: 600;
+                background-color: #eeecfd !important;
+            }
+
+            .fa-arrow-up {
+                color: #00CED1;
+            }
+
+            .fa-arrow-down {
+                color: #FF00FF;
+            }
+        </style>
+
+      @*   <Modal @ref="modal" Title="Modal title">
+            <BodyTemplate>
+                <TodoListCreate Busy="Busy"
+                                TodoListDto="newTodoList"
+                                IsAdd="true"
+                                CancelRequest="Cancel"
+                                ValidationResult="@(async (success) => await HandleSubmitAsync(success))" />
+            </BodyTemplate>
+            <FooterTemplate>
+                <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+                <Button Color="ButtonColor.Primary">Save changes</Button>
+            </FooterTemplate>
+        </Modal> *@
+    </div>
+
 }
 
 @code {
@@ -107,6 +188,18 @@ else
         Busy = true;
         Navigation.NavigateTo($"/");
     }
+
+    // private Modal modal = default!;
+
+    // private async Task OnShowModalClick()
+    // {
+    //     await TodoListCreate.ShowAsync();
+    // }
+
+    // private async Task OnHideModalClick()
+    // {
+    //     await TodoListCreate.HideAsync();
+    // }
 
     private bool Busy;
 }
