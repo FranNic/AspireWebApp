@@ -33,6 +33,11 @@ public class CreateTodoItemCommand : IRequest<TodoItemDto>
 
         public async Task<TodoItemDto> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(request.Title))
+            {
+                return null;
+            }
+
             TodoItem entity = new TodoItem
             {
                 Title = request.Title,

@@ -4,9 +4,9 @@ using Todo.Application.DTOs;
 
 public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
 {
-    public async Task<IEnumerable<TodoListDto>> GetTodoListsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<TodoListDto>> GetTodoListsAsync(CancellationToken cancellationToken = default)
     {
-        return await httpClient.GetFromJsonAsync<IEnumerable<TodoListDto>>("api/todolist", cancellationToken);
+        return await httpClient.GetFromJsonAsync<List<TodoListDto>>("api/todolist", cancellationToken);
     }
 
     public async Task<TodoListDto> GetTodoListAsync(Guid id, CancellationToken cancellationToken = default)
@@ -47,7 +47,7 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
             HttpResponseMessage result = await httpClient.PostAsJsonAsync($"api/todolist/", todoList, cancellationToken);
             if (!result.IsSuccessStatusCode)
             {
-                //logger.LogError("Failed to add todo item to list {id}", id);
+                logger.LogError("Failed to add todo item to list {id}", todoList.Id);
                 return;
             }
 
