@@ -42,11 +42,32 @@ else
                         <MudTh>#</MudTh>
                         <MudTh>Title</MudTh>
                         <MudTh>Count</MudTh>
+                        <MudTh>Actions</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@GetRowNumber(context)</MudTd>
-                        <MudTd DataLabel="Sign">@context.Title</MudTd>
+                        <MudTd DataLabel="Sign" style="width: 60%;">@context.Title</MudTd>
                         <MudTd DataLabel="Name">@context.Items.Count</MudTd>
+                        <MudTd>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@(() => Navigation.NavigateTo($"/todo/{context.Id}"))">
+                                View
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => { _openDeletePopOver = true; ItemToDelete = context.Id;})">Delete</MudButton>
+                            
+                            <MudOverlay @bind-Visible="_openDeletePopOver" AutoClose="true" />
+                            <MudPopover Open="@(_openDeletePopOver && context.Id == ItemToDelete)"
+                                        AnchorOrigin="Origin.CenterRight"
+                                        TransformOrigin="Origin.BottomRight"
+                                        RelativeWidth="DropdownWidth.Ignore">
+
+                                <div class="d-flex flex-column">
+                                    <MudButtonGroup OverrideStyles="false">
+                                        <MudButton OnClick="@(()=> { _openDeletePopOver = false; ItemToDelete = Guid.Empty;})" Color="Color.Default" StartIcon="@Icons.Material.Outlined.Cancel">Cancel</MudButton>
+                                        <MudButton OnClick="@(()=> { _openDeletePopOver = false; ;})" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete">Delete</MudButton>
+                                    </MudButtonGroup>
+                                </div>
+                            </MudPopover>
+                        </MudTd>
                     </RowTemplate>
                     <PagerContent>
                         <MudTablePager />
@@ -67,6 +88,10 @@ else
     private TodoListDto selectedItem1 = null;
     private HashSet<TodoListDto> selectedItems = new HashSet<TodoListDto>();
 
+    // Delete logic
+    private Guid ItemToDelete { get; set; }
+    public bool _openDeletePopOver;
+
     private IEnumerable<TodoListDto> TodoListDtos = new List<TodoListDto>();
 
     protected override async Task OnInitializedAsync()
@@ -85,12 +110,10 @@ else
         return false;
     }
 
-
     private TodoListDto? newTodoList { get; set; } = new();
     private bool Busy;
     public int? GetRowNumber(object element) =>
         TodoListDtos?.TakeWhile(x => x != element).Count();
-
 
     private async Task HandleSubmitAsync(bool success)
     {
@@ -129,8 +152,10 @@ else
             StateHasChanged();
         }
     }
+
     private void Cancel()
     {
         newTodoList = null;
     }
+
 }
