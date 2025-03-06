@@ -9,7 +9,7 @@
 
         <MudTextField T="string" Label="Title" Required="true" RequiredError="Title is required!" @bind-Value="TodoListDto.Title"/>
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick="@(()=>HandleSubmitAsync(form.IsValid))">Add</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(()=>HandleSubmitAsync(form.IsValid))">Add</MudButton>
 
     </MudForm>
 }

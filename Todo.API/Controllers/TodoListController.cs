@@ -57,4 +57,17 @@ public class TodoListController : ControllerBase
 
         return CreatedAtRoute("GetById", new { id = todoList.Id }, todoList);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        DeleteTodoListCommand command = new DeleteTodoListCommand
+        {
+            Id = id
+        };
+
+        await _mediator.Send(command);
+
+        return NoContent();
+    }
 }

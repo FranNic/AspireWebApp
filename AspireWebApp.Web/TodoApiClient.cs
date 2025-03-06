@@ -1,6 +1,9 @@
 ﻿namespace AspireWebApp.Web;
 
+using System.Threading;
+
 using Todo.Application.DTOs;
+using Todo.Domain;
 
 public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
 {
@@ -14,7 +17,6 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
         return await httpClient.GetFromJsonAsync<TodoListDto>($"api/todolist/{id}", cancellationToken);
     }
 
-    // Post method add todoitem to the list
     public async Task CreateTodoItemAsync(Guid id, TodoItemDto todoItem, CancellationToken cancellationToken = default)
     {
         try
@@ -40,26 +42,37 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
     /// <param name="todoList">The TodoListDto object representing the todo list to create</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns>A task representing the asynchronous operation</returns>
-    public async Task CreateTodoListAsync(TodoListDto todoList, CancellationToken cancellationToken = default)
+    public async Task<TodoListDto?> CreateTodoListAsync(TodoListDto todoList, CancellationToken cancellationToken = default)
     {
         try
         {
-            HttpResponseMessage result = await httpClient.PostAsJsonAsync($"api/todolist/", todoList, cancellationToken);
+            HttpResponseMessage result = await httpClient.PostAsJsonAsync("api/todolist/", todoList, cancellationToken);
+
             if (!result.IsSuccessStatusCode)
             {
-                logger.LogError("Failed to add todo item to list {id}", todoList.Id);
-                return;
+                string errorMessage = await result.Content.ReadAsStringAsync();
+                logger.LogError("Failed to add todo list. Status: {StatusCode}, Response: {ErrorMessage}",
+                    result.StatusCode, errorMessage);
+                return null;
             }
 
-            return;
+            TodoListDto? createdTodoList = await result.Content.ReadFromJsonAsync<TodoListDto>(cancellationToken: cancellationToken);
+
+            if (createdTodoList == null)
+            {
+                logger.LogWarning("Received null response when creating a todo list.");
+            }
+
+            return createdTodoList;
         }
         catch (Exception ex)
         {
-            throw;
+            logger.LogError(ex, "An error occurred while creating the todo list.");
+            throw; // Keep throwing so the caller can handle it
         }
     }
 
-    // add delete
+
     public async Task<bool> DeleteTodoItemAsync(Guid listId, Guid todoItemId, CancellationToken cancellationToken = default)
     {
         try
@@ -79,7 +92,25 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
         }
     }
 
-    //add update
+    public async Task<bool> DeleteTodoListAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            HttpResponseMessage result = await httpClient.DeleteAsync($"api/todolist/{id}", cancellationToken);
+            if (!result.IsSuccessStatusCode)
+            {
+                logger.LogError("Failed to delete todo list {id}", id);
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
     public async Task UpdateTodoItemAsync(Guid id, TodoItemDto todoItem, CancellationToken cancellationToken = default)
     {
         try
