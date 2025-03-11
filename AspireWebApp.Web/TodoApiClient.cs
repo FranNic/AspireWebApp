@@ -111,7 +111,7 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
         }
     }
 
-    public async Task UpdateTodoItemAsync(Guid id, TodoItemDto todoItem, CancellationToken cancellationToken = default)
+    public async Task<TodoItemDto?> UpdateTodoItemAsync(Guid id, TodoItemDto todoItem, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -119,10 +119,10 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
             if (!result.IsSuccessStatusCode)
             {
                 logger.LogError("Failed to update todo item {id}", id);
-                return;
+                return null;
             }
 
-            return;
+            return todoItem;
         }
         catch (Exception ex)
         {

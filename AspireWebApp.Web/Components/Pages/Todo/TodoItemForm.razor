@@ -1,35 +1,13 @@
-﻿<h3>Todo item form</h3>
-
-﻿@using Microsoft.AspNetCore.Components.Forms;
-@using global::Todo.Application.DTOs
-
-
-@if (TodoItemDto is not null)
+﻿@if (TodoItemDto is not null)
 {
-    <EditForm Model="TodoItemDto"
-              OnInvalidSubmit="(async () => await HandleSubmitAsync(false))"
-              OnValidSubmit="(async () => await HandleSubmitAsync(true))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-            
-        <h2>Title</h2>
-        <p>
-            <label>
-                First Name:
-                <InputText @bind-Value="TodoItemDto.Title" />
-            </label>
-        </p>
-      
-        <br />
-        <button type="button" disabled="@Busy" class="btn btn-warning"
-                @onclick="CancelAsync">
-            Cancel
-        </button>&nbsp;
-        <button disabled="@Busy" type="submit"
-                class="btn btn-primary">
-            Submit
-        </button>
-    </EditForm>
+
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Model="TodoItemDto">
+
+        <MudTextField T="string" Label="Title" Required="true" RequiredError="Title is required!" @bind-Value="TodoItemDto.Title" />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(()=>HandleSubmitAsync(form.IsValid))">Add</MudButton>
+
+    </MudForm>
 }
 
 @code {
@@ -43,7 +21,7 @@
 
     // True if add mode.
     [Parameter]
-    public bool IsAdd { get; set; }
+    public bool IsAdd { get; set; } = true;
 
     // The TodoItemDto to upsert.
     [Parameter]
@@ -68,4 +46,11 @@
     {
         return ValidationResult.InvokeAsync(isValid); // this invokes the function in the parent component
     }
+
+    // MudBlazor form.
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
 }

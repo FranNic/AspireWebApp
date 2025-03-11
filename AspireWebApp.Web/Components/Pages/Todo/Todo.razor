@@ -13,9 +13,10 @@
     <p><em>Loading...</em></p>
 }
 else
-{
+{   
     <MudGrid>
         <MudItem xs="12" sm="12">
+            <h4>Create Todo List</h4>
             <MudPaper Class="pa-4">
                 <TodoListCreate Busy="Busy"
                                 TodoListDto="newTodoList"
@@ -29,7 +30,7 @@ else
             <MudPaper Class="pa-4">
                 <MudTable T="TodoListDto" Items="@TodoListDtos" Dense="false" Hover="false" Bordered="false" Striped="true" Filter="new Func<TodoListDto,bool>(FilterFuncDelegate)">
                     <ToolBarContent>
-                        <MudText Typo="Typo.h6">Periodic TodoListDtos</MudText>
+                        <MudText Typo="Typo.h6">Todo Lists</MudText>
                         <MudSpacer />
                         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                     </ToolBarContent>
