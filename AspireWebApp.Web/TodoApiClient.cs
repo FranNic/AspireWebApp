@@ -17,7 +17,7 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
         return await httpClient.GetFromJsonAsync<TodoListDto>($"api/todolist/{id}", cancellationToken);
     }
 
-    public async Task CreateTodoItemAsync(Guid id, TodoItemDto todoItem, CancellationToken cancellationToken = default)
+    public async Task<TodoItemDto?> CreateTodoItemAsync(Guid id, TodoItemDto todoItem, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -25,10 +25,17 @@ public class TodoApiClient(HttpClient httpClient, ILogger<TodoApiClient> logger)
             if (!result.IsSuccessStatusCode)
             {
                 logger.LogError("Failed to add todo item to list {id}", id);
-                return;
+                return null;
             }
 
-            return;
+            TodoItemDto? createdTodoItem = await result.Content.ReadFromJsonAsync<TodoItemDto>(cancellationToken: cancellationToken);
+
+            if (createdTodoItem == null)
+            {
+                logger.LogWarning("Received null response when creating a todo list.");
+            }
+
+            return createdTodoItem;
         }
         catch (Exception ex)
         {
