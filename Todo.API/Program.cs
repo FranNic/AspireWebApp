@@ -25,6 +25,12 @@ builder.Services.AddMassTransit(x =>
         cfg.Host(host);
         cfg.ConfigureEndpoints(context);
     });
+
+    x.AddEntityFrameworkOutbox<TodoDbContext>(o =>
+    {
+        o.UseSqlServer();
+        o.UseBusOutbox();
+    });
 });
 
 

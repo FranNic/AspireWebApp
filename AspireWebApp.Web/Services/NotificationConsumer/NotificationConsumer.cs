@@ -8,11 +8,9 @@ using MassTransit;
 
 public class NotificationConsumer : IConsumer<IntegrationEvent>
 {
-    private readonly IBus _bus;
     private readonly ToastNotificationService _toastNotificationService;
-    public NotificationConsumer(IBus bus, ToastNotificationService toastNotificationService)
+    public NotificationConsumer(ToastNotificationService toastNotificationService)
     {
-        _bus = bus;
         _toastNotificationService = toastNotificationService;
     }
 
