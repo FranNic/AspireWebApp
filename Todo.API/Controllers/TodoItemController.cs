@@ -46,6 +46,11 @@ public class TodoItemController : ControllerBase
                 ListId = todolistId
             });
 
+            if (item == null)
+            {
+                return BadRequest();
+            }
+
             return Created("GetById", item);
         }
         catch (Exception ex)

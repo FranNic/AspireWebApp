@@ -1,71 +1,109 @@
 ﻿@page "/todo"
-@using AspireWebApp.Web.Helpers
-@using global::Todo.Application.DTOs
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
 
+@inject IDialogService DialogService
 @inject TodoApiClient TodoApiClient
 @inject NavigationManager Navigation
 
 @rendermode InteractiveServer
 
-
-<h3>Todo</h3>
-
-@if (todoLists == null)
+@if (TodoListDtos == null)
 {
     <p><em>Loading...</em></p>
 }
 else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Items</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var todoList in todoLists)
-            {
-                <tr>
-                    <td>@todoList.Title</td>
-                    <td>@todoList.Items.Count</td>
-                    <td><a class="btn btn-primary" href="@ItemHelper.TodoListUrl(todoList)">View</a></td>
-                    <td><a class="btn btn-primary" href="@ItemHelper.TodoListUrl(todoList)">Delete</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <TodoListCreate Busy="Busy"
-                    TodoListDto="newTodoList"
-                    IsAdd="true"
-                    CancelRequest="Cancel"
-                    ValidationResult="@(async (success) => await HandleSubmitAsync(success))" />
+{   
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <h4>Create Todo List</h4>
+            <MudPaper Class="pa-4">
+                <TodoListCreate Busy="Busy"
+                                TodoListDto="newTodoList"
+                                IsAdd="true"
+                                CancelRequest="Cancel"
+                                ValidationResult="@(async (success) => await CreateTodoListAsync(success))" />
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="12">
+            <MudPaper Class="pa-4">
+                <MudTable T="TodoListDto" Items="@TodoListDtos" Dense="false" Hover="false" Bordered="false" Striped="true" Filter="new Func<TodoListDto,bool>(FilterFuncDelegate)">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Todo Lists</MudText>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>#</MudTh>
+                        <MudTh>Title</MudTh>
+                        <MudTh>Count</MudTh>
+                        <MudTh>Actions</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@GetRowNumber(context)</MudTd>
+                        <MudTd DataLabel="Sign" style="width: 60%;">@context.Title</MudTd>
+                        <MudTd DataLabel="Name">@context.Items.Count</MudTd>
+                        <MudTd>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@(() => Navigation.NavigateTo($"/todo/{context.Id}"))">
+                                View
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => { _openDeletePopOver = true; ItemToDelete = context.Id;})">Delete</MudButton>
+
+                            <MudOverlay @bind-Visible="_openDeletePopOver" AutoClose="true" />
+                            <MudPopover Open="@(_openDeletePopOver && context.Id == ItemToDelete)"
+                                        AnchorOrigin="Origin.CenterRight"
+                                        TransformOrigin="Origin.BottomRight"
+                                        RelativeWidth="DropdownWidth.Ignore">
+
+                                <div class="d-flex flex-column">
+                                    <MudButtonGroup OverrideStyles="false">
+                                        <MudButton OnClick="@(async result=> { await Cancel();})" Color="Color.Default" StartIcon="@Icons.Material.Outlined.Cancel">Cancel</MudButton>
+                                        <MudButton OnClick="@(async result => { _openDeletePopOver = false; await DeleteAsync(ItemToDelete);})" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete">Delete</MudButton>
+                                    </MudButtonGroup>
+                                </div>
+                            </MudPopover>
+                        </MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+
+    </MudGrid>
 }
 
 @code {
+    private bool Busy;
+    private string searchString = "";
+    private List<TodoListDto> TodoListDtos = new List<TodoListDto>();
+    private TodoListDto? newTodoList { get; set; } = new();
 
-    private TodoListDto[]? todoLists;
-    private TodoListDto? newTodoList { get; set; }
+    // Delete logic
+    private Guid ItemToDelete { get; set; }
+    public bool _openDeletePopOver;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var enumerable = await TodoApiClient.GetTodoListsAsync();
-
-            todoLists = enumerable.ToArray();
-            newTodoList = new();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-
+        TodoListDtos = await TodoApiClient.GetTodoListsAsync();
     }
 
-    private async Task HandleSubmitAsync(bool success)
+    private bool FilterFuncDelegate(TodoListDto TodoListDto) => FilterFunc(TodoListDto, searchString);
+
+    private bool FilterFunc(TodoListDto TodoListDto, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (TodoListDto.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    public int? GetRowNumber(object element) => TodoListDtos?.TakeWhile(x => x != element).Count();
+
+    private async Task CreateTodoListAsync(bool success)
     {
         if (Busy)
         {
@@ -84,8 +122,11 @@ else
 
         try
         {
-            await TodoApiClient.CreateTodoListAsync(newTodoList);
-
+            TodoListDto newDto = await TodoApiClient.CreateTodoListAsync(newTodoList);
+            if (newDto != null)
+            {
+                TodoListDtos.Add(newDto);
+            }
         }
         // catch (ApiException ex) when (ex.StatusCode == 409)
         // {
@@ -102,11 +143,30 @@ else
             Busy = false;
         }
     }
-    private void Cancel()
+
+    private async Task Cancel()
     {
-        Busy = true;
-        Navigation.NavigateTo($"/");
+        newTodoList = null;
+        _openDeletePopOver = false;
+        ItemToDelete = Guid.Empty;
+        this.TodoListDtos = await TodoApiClient.GetTodoListsAsync();
     }
 
-    private bool Busy;
+    private async Task DeleteAsync(Guid id)
+    {
+        if (Busy)
+        {
+            // Avoid concurrent requests.
+            return;
+        }
+
+        // call the api
+        bool response = await TodoApiClient.DeleteTodoListAsync(id, new CancellationToken());
+
+        if (response)
+        {
+            // refresh the UI
+            TodoListDtos.RemoveAll(x => x.Id == id);
+        }
+    }
 }

@@ -9,7 +9,6 @@
 @inject NavigationManager Navigation
 @inject TodoApiClient TodoApiClient
 
-<h3>Todo List</h3>
 
 @if (todoList == null)
 {
@@ -17,54 +16,65 @@
 }
 else
 {
-    <section class="vh-100" style="background-color: #e2d5de;">
-        <div class="container py-5 h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col col-xl-10">
+    <MudContainer MaxWidth="MaxWidth.Large">
 
-                    <div class="card" style="border-radius: 15px;">
-                        <div class="card-body p-5">
+        <h3>@todoList.Title</h3>
 
-                            <h6 class="mb-3">Awesome Todo List</h6>
-
-                            <EditForm Model="TodoItemToAdd" Formname="add-task" OnSubmit="@AddTask" class="d-flex justify-content-center align-items-center mb-4">
-                                <div data-mdb-input-init class="form-outline flex-fill">
-                                    <InputText type="text" id="form3" class="form-control form-control-lg" @bind-Value="TodoItemToAdd.Title" placeholder="What do you need to do today?" />
-                                </div>
-                                <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg ms-2">Add</button>
-                            </EditForm>
-                            <ul class="list-group mb-0">
-                                @foreach (var item in EditableTodoItems)
-                                {
-
-                                    <li class="list-group-item d-flex d-flex align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <input class="form-check-input me-2" type="checkbox" checked="@item.IsDone" @oninput="@(() => SwitchIsDone(item))" />
-                                            <span style="@(item.IsDone ? "text-decoration: line-through;":"")">@item!.Title </span>
-                                        </div>
-                                        <div class="col col-xl-3">
-                                            <a class="btn btn-default" href="@ItemHelper.TodoItemUrl(todoList, item)">Edit</a>
-                                            <button class="btn btn-danger" @onclick="@(() => { ShowDeleteConfirmation = true; ItemToDelete = item.Id;})">Delete</button>
-                                        </div>
-
-                                    </li>
-
-                                    if (ShowDeleteConfirmation && item.Id.Equals(ItemToDelete))
-                                    {
-                                        <DeletePrompt Confirmation="@(async result => await ConfirmDeleteAsync(result, item.Id))" />
-                                    }
-                                }
-                            </ul>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <h5>Create Todo Item</h5>
+                <MudCard>
+                    <MudCardContent>
+                        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Model="TodoItemToAdd">
+                            <MudTextField T="string" Label="Title" Required="true" RequiredError="Title is required!" @bind-Value="TodoItemToAdd.Title" />
+                            <MudTextField T="string" Label="Description" Required="true" RequiredError="Description is required!" @bind-Value="TodoItemToAdd.Description" />
+                            <MudDatePicker Label="Due date" @bind-Date="_date" DateFormat="dd/MM/yyyy" />
+                        </MudForm>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(()=>AddTask())">Add</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="8">
+                <MudPaper Class="pa-4 mud-height-full">
+                    <MudStack>
+                        @foreach (var item in EditableTodoItems)
+                        {
+                            <MudPaper Class="pa-3">
+                                <MudToggleIconButton Toggled="item.IsDone"
+                                                     ToggledChanged="async result => SwitchIsDone(item)"
+                                                     Icon="@Icons.Material.Filled.CheckBoxOutlineBlank"
+                                                     Color="@Color.Primary"
+                                                     ToggledIcon="@Icons.Material.Filled.CheckBox"
+                                                     ToggledColor="@Color.Success"
+                                                     title="@(item.IsDone ? "Done" : "NotDone")" />
+                                <span style="@(item.IsDone ? "text-decoration: line-through;" : "")">@item.Title</span>
+                                <span style="@(item.IsDone ? "text-decoration: line-through; color:#979797" : "color:#979797")">@item.Description</span>
+                                <MudToggleIconButton Toggled="(ShowDeleteConfirmation && ItemToDelete == item.Id)"
+                                                     ToggledChanged="async result => await SwitchDeleteConfirmation(item.Id)"
+                                                     Icon="@Icons.Material.Filled.Delete"
+                                                     Color="@Color.Secondary"
+                                                     ToggledIcon="@Icons.Material.Filled.Cancel"
+                                                     ToggledColor="@Color.Default"
+                                                     title="@(item.IsDone ? "Done" : "NotDone")" />
+                                <MudIconButton Class="@(ShowDeleteConfirmation && ItemToDelete == item.Id ? "": "invisible")" Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Error" OnClick="@(async result => await ConfirmDeleteAsync(item.Id))" />
+                            </MudPaper>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
 }
 
 @code {
+    // MudBlazor form.
+    bool success;
+    string[] errors = { };
+    MudForm form;
+    private DateTime? _date = DateTime.Today; // Date needs to be initialized or used outside the object.
+
     private TodoListDto? todoList;
     private string? taskName;
 
@@ -94,64 +104,74 @@ else
 
     private async Task AddTask()
     {
-        if (string.IsNullOrWhiteSpace(TodoItemToAdd?.Title))
+        await this.form.Validate();
+        if (!this.form.IsValid)
         {
             return;
         }
 
-        TodoItemToAdd.Description = TodoItemToAdd.Title;
+        TodoItemToAdd.DueDate = _date;
 
         // call the api
-        await TodoApiClient.CreateTodoItemAsync(todoList.Id, TodoItemToAdd);
+        TodoItemDto createdTodoItem = await TodoApiClient.CreateTodoItemAsync(todoList.Id, TodoItemToAdd);
 
         // Clear the task name
         taskName = null;
 
-        // refresh the UI
-        Navigation.Refresh(true);
+        // refresh the UI by adding it to the list
+        if (createdTodoItem != null)
+            EditableTodoItems = EditableTodoItems.Append(createdTodoItem).ToArray();
     }
 
-    private async Task SwitchIsDone(TodoItemDto todoItemDto)
+    private async Task SwitchIsDone(TodoItemDto todoItemDtoToUpdate)
     {
-        if (todoItemDto == null)
+        if (todoItemDtoToUpdate == null)
         {
             return;
         }
 
-        todoItemDto.IsDone = !todoItemDto.IsDone;
+        todoItemDtoToUpdate.IsDone = !todoItemDtoToUpdate.IsDone;
 
         // get the checkbox state
-        await TodoApiClient.UpdateTodoItemAsync(TodoListId, todoItemDto);
+        TodoItemDto? todoitemUpdated = await TodoApiClient.UpdateTodoItemAsync(TodoListId, todoItemDtoToUpdate);
 
-        Navigation.Refresh(true);
+        // refresh the UI
+        if (todoitemUpdated != null)
+        {
+            //find in collection and update
+            var index = EditableTodoItems.ToList().FindIndex(x => x.Id == todoitemUpdated.Id);
+            EditableTodoItems[index] = todoitemUpdated;
+        }
     }
 
-    private async Task UpdateTodoItem(ChangeEventArgs e, TodoItemDto todoItemDto)
+    private async Task SwitchDeleteConfirmation(Guid id)
     {
-        // call the api
-        await TodoApiClient.UpdateTodoItemAsync(todoList.Id, todoItemDto);
-
-        // refresh the UI on servermode
-        Navigation.Refresh(true);
+        if (ShowDeleteConfirmation && ItemToDelete != id)
+        {
+            ShowDeleteConfirmation = true;
+            ItemToDelete = id;
+            return;
+        }
+        ShowDeleteConfirmation = !ShowDeleteConfirmation;
+        ItemToDelete = ShowDeleteConfirmation ? id : Guid.Empty;
     }
+
+    // Delegate to update the todo item
+
+    // private async Task UpdateTodoItem(ChangeEventArgs e, TodoItemDto todoItemDto)
+    // {
+    //     // call the api
+    //     await TodoApiClient.UpdateTodoItemAsync(todoList.Id, todoItemDto);
+
+    //     // refresh the UI by modifing the collection
+    // }
+
 
     // Confirm deletion.
     // result is True when user confirmed.
-    private async Task ConfirmDeleteAsync(bool result, Guid id)
+    private async Task ConfirmDeleteAsync(Guid id)
     {
-        if (result)
-        {
-            await DeleteAsync(id);
-        }
-        else
-        {
-            ShowDeleteConfirmation = false;
-        }
-    }
-
-    private async Task DeleteAsync(Guid id)
-    {
-        if (Loading)
+        if (Loading && ItemToDelete != id)
         {
             // Avoid concurrent requests.
             return;
@@ -162,9 +182,13 @@ else
 
         if (response)
         {
-            // refresh the UI on servermode
-            Navigation.Refresh(true);
+            // refresh UI by removing item from the list
+            EditableTodoItems = EditableTodoItems.Where(x => x.Id != id).ToArray();
+            _ = SwitchDeleteConfirmation(id);
+        }
+        else
+        {
+            ShowDeleteConfirmation = false;
         }
     }
-
 }

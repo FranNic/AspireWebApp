@@ -1,36 +1,13 @@
-﻿<h3>Todo List form</h3>
-
-﻿@using Microsoft.AspNetCore.Components.Forms;
-@using global::Todo.Application.DTOs
-
-
-@if (TodoListDto is not null)
+﻿@if (TodoListDto is not null)
 {
-    <EditForm 
-        FormName="CreateTodoListForm"
-        Model="TodoListDto"
-              OnInvalidSubmit="(async () => await HandleSubmitAsync(false))"
-              OnValidSubmit="(async () => await HandleSubmitAsync(true))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
 
-        <p>
-            <label>
-                Title:
-                <InputText @bind-Value="TodoListDto.Title" />
-            </label>
-        </p>
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Model="TodoListDto">
 
-        <br />
-        <button type="button" disabled="@Busy" class="btn btn-warning"
-                @onclick="CancelAsync">
-            Cancel
-        </button>&nbsp;
-        <button disabled="@Busy" type="submit"
-                class="btn btn-primary">
-            Submit
-        </button>
-    </EditForm>
+        <MudTextField T="string" Label="Title" Required="true" RequiredError="Title is required!" @bind-Value="TodoListDto.Title"/>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(()=>HandleSubmitAsync(form.IsValid))">Add</MudButton>
+
+    </MudForm>
 }
 
 @code {
@@ -69,4 +46,11 @@
     {
         return ValidationResult.InvokeAsync(isValid); // this invokes the function in the parent component
     }
+
+    // MudBlazor form.
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
 }
