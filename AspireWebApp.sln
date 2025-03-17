@@ -16,8 +16,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Infrastructure", "Todo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Application", "Todo.Application\Todo.Application.csproj", "{4602142C-D315-441F-ACAF-3E03B2BB401C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransitDemo", "MassTransit\MassTransitDemo.csproj", "{27D3E9EC-BF59-4A95-993A-1CFA29C1D786}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus", "EventBus\EventBus.csproj", "{6D37802D-D27F-4008-A320-C395AAD6BE67}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireWebApp.Web", "AspireWebApp.Web\AspireWebApp.Web.csproj", "{4D1013E6-90A3-4486-AA00-53C73F0D6505}"
@@ -56,10 +54,6 @@ Global
 		{4602142C-D315-441F-ACAF-3E03B2BB401C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4602142C-D315-441F-ACAF-3E03B2BB401C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4602142C-D315-441F-ACAF-3E03B2BB401C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27D3E9EC-BF59-4A95-993A-1CFA29C1D786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27D3E9EC-BF59-4A95-993A-1CFA29C1D786}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27D3E9EC-BF59-4A95-993A-1CFA29C1D786}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27D3E9EC-BF59-4A95-993A-1CFA29C1D786}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6D37802D-D27F-4008-A320-C395AAD6BE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6D37802D-D27F-4008-A320-C395AAD6BE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D37802D-D27F-4008-A320-C395AAD6BE67}.Release|Any CPU.ActiveCfg = Release|Any CPU

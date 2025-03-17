@@ -23,12 +23,12 @@ public class CreateTodoItemCommand : IRequest<TodoItemDto>
     public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, TodoItemDto>
     {
         private readonly ITodoDbContext _context;
-        private readonly IBus _bus;
+        private readonly IPublishEndpoint _publishEndpoint;
 
         public CreateTodoItemCommandHandler(ITodoDbContext context, IBus bus)
         {
             _context = context;
-            _bus = bus;
+            _publishEndpoint = bus;
         }
 
         public async Task<TodoItemDto> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
@@ -46,13 +46,15 @@ public class CreateTodoItemCommand : IRequest<TodoItemDto>
             };
 
             await _context.TodoItems.AddAsync(entity);
-            await _context.SaveChangesAsync(cancellationToken);
 
-            _ = _bus.Publish(new IntegrationEvent
+            // Ensure event is only published if transaction commits
+            await _publishEndpoint.Publish(new IntegrationEvent
             {
                 Id = entity.Id,
-                Message = "TodoItem Created",
+                Message = $"Todo item {request.Title} created",
             });
+
+            await _context.SaveChangesAsync(cancellationToken); // Now SaveChanges triggers the Outbox
 
             return entity.ToDto();
         }

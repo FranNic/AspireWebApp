@@ -2,11 +2,6 @@
 
 @rendermode InteractiveServer
 
-@using AspireWebApp.Web.Helpers
-@using global::Todo.Application.DTOs
-
-
-@inject NavigationManager Navigation
 @inject TodoApiClient TodoApiClient
 
 
@@ -49,8 +44,10 @@ else
                                                      ToggledIcon="@Icons.Material.Filled.CheckBox"
                                                      ToggledColor="@Color.Success"
                                                      title="@(item.IsDone ? "Done" : "NotDone")" />
+
                                 <span style="@(item.IsDone ? "text-decoration: line-through;" : "")">@item.Title</span>
                                 <span style="@(item.IsDone ? "text-decoration: line-through; color:#979797" : "color:#979797")">@item.Description</span>
+
                                 <MudToggleIconButton Toggled="(ShowDeleteConfirmation && ItemToDelete == item.Id)"
                                                      ToggledChanged="async result => await SwitchDeleteConfirmation(item.Id)"
                                                      Icon="@Icons.Material.Filled.Delete"

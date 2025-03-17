@@ -1,8 +1,13 @@
 ﻿namespace Todo.Infrastructure.Persistence;
 
+using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
+
 using Microsoft.EntityFrameworkCore;
 
 using System.Reflection;
+using System.Reflection.Emit;
+
 using Todo.Application.Common.Interfaces;
 using Todo.Domain;
 
@@ -59,5 +64,11 @@ public class TodoDbContext : DbContext, ITodoDbContext
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
+        builder.AddOutboxMessageEntity();
+        builder.Entity<OutboxState>()
+           .HasKey(o => o.OutboxId);
+
+        builder.Entity<OutboxMessage>()
+            .HasKey(o => o.MessageId);
     }
 }
