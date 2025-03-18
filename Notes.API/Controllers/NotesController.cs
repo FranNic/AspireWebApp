@@ -22,4 +22,11 @@ public class NotesController : ControllerBase
     {
         return await _noteService.GetNotesAsync();
     }
+
+    [HttpPost(Name = "AddNote")]
+    public async Task<IActionResult> AddNoteAsync(Note note)
+    {
+        await _noteService.AddNoteAsync(note);
+        return CreatedAtRoute("GetNotes", null);
+    }
 }

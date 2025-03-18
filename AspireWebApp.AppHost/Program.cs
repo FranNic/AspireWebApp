@@ -9,7 +9,6 @@ var cache = builder.AddRedis("cache");
 var sql = builder.AddSqlServer("todoContext");
 var messaging = builder.AddRabbitMQ("RabbitMQConnection");
 var mongo = builder.AddMongoDB("mongo")
-                   .WithLifetime(ContainerLifetime.Persistent)
                    .WithMongoExpress();
 
 var mongodb = mongo.AddDatabase("mongodb");
@@ -29,7 +28,6 @@ builder.AddProject<Projects.AspireWebApp_Web>("webfrontend")
     .WithReference(messaging);
 
 builder.AddProject<Projects.Notes_API>("notes-api")
-    .WithReference(mongodb)
-    .WaitFor(mongodb);
+    .WithReference(mongodb);
 
 builder.Build().Run();

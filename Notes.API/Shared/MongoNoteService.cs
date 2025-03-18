@@ -22,6 +22,7 @@ public class MongoNoteService
     // 🟢 Add a new note
     public async Task AddNoteAsync(Note note)
     {
+        note.Id = Guid.NewGuid();
         await _notes.InsertOneAsync(note);
     }
 
