@@ -1,9 +1,19 @@
+using Microsoft.Extensions.DependencyInjection;
+
+using MongoDB.Driver;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 //builder.AddAzureProvisioning();
 var cache = builder.AddRedis("cache");
 var sql = builder.AddSqlServer("todoContext");
 var messaging = builder.AddRabbitMQ("RabbitMQConnection");
+var mongo = builder.AddMongoDB("mongo")
+                   .WithLifetime(ContainerLifetime.Persistent)
+                   .WithMongoExpress();
+
+var mongodb = mongo.AddDatabase("mongodb");
+
 
 var apiService = builder.AddProject<Projects.AspireWebApp_ApiService>("apiservice");
 
@@ -17,5 +27,9 @@ builder.AddProject<Projects.AspireWebApp_Web>("webfrontend")
     .WithReference(todoApi)
     .WithReference(apiService)
     .WithReference(messaging);
+
+builder.AddProject<Projects.Notes_API>("notes-api")
+    .WithReference(mongodb)
+    .WaitFor(mongodb);
 
 builder.Build().Run();

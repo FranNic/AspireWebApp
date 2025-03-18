@@ -1,0 +1,34 @@
+﻿@page "/notes"
+@using MudExRichTextEditor
+
+
+@* <MudCheckBox Label="Read only" @bind-Checked="_readOnly" /> *@
+
+<MudExRichTextEdit @ref="@RichText"
+                   ReadOnly="@_readOnly"
+                   Height="444"
+                   Class="m-2"
+                   Placeholder="Write here...">
+			 
+</MudExRichTextEdit>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>GetText())">Get Text</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>GetContent())">Get Content</MudButton>
+
+@code {
+    bool _readOnly = false;
+    MudExRichTextEdit RichText{ get; set; }
+
+    // get text from the editor
+    private async Task GetText()
+    {
+        var text = await RichText.GetText();
+        Console.WriteLine("Text: "+text);
+    }
+
+    private async Task GetContent()
+    {
+        var content = await RichText.GetContent();
+        Console.WriteLine("Content: " + content);
+    }
+}
