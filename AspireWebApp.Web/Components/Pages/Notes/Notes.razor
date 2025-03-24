@@ -1,34 +1,87 @@
 ﻿@page "/notes"
 @using MudExRichTextEditor
-
+@inject NotesApiClient NotesApiClient
 
 @* <MudCheckBox Label="Read only" @bind-Checked="_readOnly" /> *@
 
-<MudExRichTextEdit @ref="@RichText"
-                   ReadOnly="@_readOnly"
-                   Height="444"
-                   Class="m-2"
-                   Placeholder="Write here...">
-			 
-</MudExRichTextEdit>
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>GetText())">Get Text</MudButton>
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>GetContent())">Get Content</MudButton>
+            <MudExRichTextEdit @ref="@RichText"
+                               ReadOnly="@_readOnly"
+                               Height="444"
+                               Class="m-2"
+                               Placeholder="Write here...">
 
+            </MudExRichTextEdit>
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>AddNote())">Add</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(()=>DeleteNote())">Delete</MudButton>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="8">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudStack>
+                    @foreach(var note in noteDtos)
+                    {
+                        <MudPaper Class="pa-3">
+                            <span>@note.Content</span>
+                        </MudPaper>
+                    })
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 @code {
-    bool _readOnly = false;
-    MudExRichTextEdit RichText{ get; set; }
+    private bool _readOnly = false;
+    private MudExRichTextEdit RichText { get; set; }
+    private List<NoteDto> noteDtos { get; set; } = new List<NoteDto>();
 
     // get text from the editor
     private async Task GetText()
     {
         var text = await RichText.GetText();
-        Console.WriteLine("Text: "+text);
+        Console.WriteLine("Text: " + text);
     }
 
     private async Task GetContent()
     {
         var content = await RichText.GetContent();
         Console.WriteLine("Content: " + content);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        noteDtos = await NotesApiClient.GetNotesAsync();
+    }
+
+    private async Task AddNote()
+    {
+        var note = new NoteDto
+        {
+            Content = await RichText.GetContent()
+        };
+
+        var response = await NotesApiClient.CreateNoteAsync(note, new CancellationToken());
+        if(response != null)
+        {
+            noteDtos.Add(response);
+        }
+    }
+
+    private async Task DeleteNote()
+    {
+        var note = new NoteDto
+        {
+            Content = await RichText.GetContent()
+        };
+
+        var response = await NotesApiClient.DeleteNoteAsync(note.Id, new CancellationToken());
+        if(response)
+        {
+            noteDtos.Remove(note);
+        }
     }
 }
