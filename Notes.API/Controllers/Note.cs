@@ -7,6 +7,6 @@ public class Note
     public string Content { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public string Category { get; set; }
-    public string Tags { get; set; }
+    public string? Category { get; set; }
+    public string[] Tags { get; set; }
 }

@@ -2,7 +2,7 @@ using Notes.API.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddMongoDBClient(connectionName: "mongodb");
+builder.AddMongoDBClient(connectionName: "mongo");
 builder.AddServiceDefaults();
 
 // Add services to the container.

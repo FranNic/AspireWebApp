@@ -27,7 +27,7 @@ public class MongoNoteService
     }
 
     // 🔍 Get all notes filtered by category (optional)
-    public async Task<List<Note>> GetNotesAsync(string category = null)
+    public async Task<List<NoteDto>> GetNotesAsync(string category = null)
     {
         var filter = Builders<Note>.Filter.Empty;
 
@@ -36,6 +36,15 @@ public class MongoNoteService
 
         return await _notes.Find(filter)
                            .SortByDescending(n => n.CreatedAt)
+                           .Project<NoteDto>(category == null ? Builders<Note>.Projection.Exclude(n => n.Category) : Builders<Note>.Projection.Expression(n => new NoteDto
+                           {
+                               Id = n.Id,
+                               Title = n.Title,
+                               Content = n.Content,
+                               CreatedAt = n.CreatedAt,
+                               UpdatedAt = n.UpdatedAt,
+                               Category = n.Category
+                           }))
                            .ToListAsync();
     }
 

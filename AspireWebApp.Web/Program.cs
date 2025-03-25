@@ -45,6 +45,13 @@ builder.Services.AddHttpClient<TodoApiClient>(client =>
     client.BaseAddress = new("https+http://todo-api");
 });
 
+builder.Services.AddHttpClient<NotesApiClient>(client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https+http://notes-api");
+});
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<NotificationConsumer>();

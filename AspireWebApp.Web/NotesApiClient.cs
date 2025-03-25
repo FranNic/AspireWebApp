@@ -19,7 +19,7 @@ public class NotesApiClient(HttpClient httpClient, ILogger<NotesApiClient> logge
             HttpResponseMessage result = await httpClient.PostAsJsonAsync("api/notes", note, cancellationToken);
             if (!result.IsSuccessStatusCode)
             {
-                logger.LogError("Failed to create note");
+                logger.LogError($"Failed to create note. Reason: {result.Content}");
                 return null;
             }
 

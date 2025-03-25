@@ -5,7 +5,7 @@ using Notes.API.Shared;
 namespace Notes.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/notes")]
 public class NotesController : ControllerBase
 {
     private readonly ILogger<NotesController> _logger;
@@ -18,15 +18,15 @@ public class NotesController : ControllerBase
     }
 
     [HttpGet(Name = "GetNotes")]
-    public async Task<IEnumerable<Note>> GetAllAsync()
+    public async Task<IEnumerable<NoteDto>> GetAllAsync()
     {
         return await _noteService.GetNotesAsync();
     }
 
-    [HttpPost(Name = "AddNote")]
-    public async Task<IActionResult> AddNoteAsync(Note note)
+    [HttpPost]
+    public async Task<IActionResult> AddNoteAsync(NoteDto dto, CancellationToken cancellationToken)
     {
-        await _noteService.AddNoteAsync(note);
-        return CreatedAtRoute("GetNotes", null);
+        await _noteService.AddNoteAsync(dto.ToNote());
+        return CreatedAtRoute("GetNotes", dto);
     }
 }
