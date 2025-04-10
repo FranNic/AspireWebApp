@@ -18,4 +18,6 @@ builder.AddProject<Projects.AspireWebApp_Web>("webfrontend")
     .WithReference(apiService)
     .WithReference(messaging);
 
+builder.AddProject<Projects.Exercise_API>("exercise-api");
+
 builder.Build().Run();
