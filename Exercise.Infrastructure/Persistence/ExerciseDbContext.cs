@@ -1,4 +1,4 @@
-﻿namespace Exercise.Infrastructure.Persistence;
+﻿namespace Exercises.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,15 +12,17 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Exercises.Domain;
+using Exercises.Application.Common.Interfaces;
 
-public class ExerciseDbContext : DbContext, IExerciseDbContext
+public class ExerciseDbContext : DbContext, IExercisesDbContext
 {
     public DbSet<Exercise> Exercises => Set<Exercise>();
-    public DbSet<BodyPart> BodyParts => Set<BodyPart>();
     public DbSet<Equipment> Equipment => Set<Equipment>();
     public DbSet<MuscleActivation> MuscleActivations => Set<MuscleActivation>();
     public DbSet<Muscle> Muscles => Set<Muscle>();
     public DbSet<Set> Sets => Set<Set>();
+    public DbSet<ActivationLevel> ActivationLevels => Set<ActivationLevel>();
+
 
     public ExerciseDbContext(DbContextOptions<ExerciseDbContext> options)
         : base(options)

@@ -1,14 +1,14 @@
-﻿namespace Exercise.Infrastructure;
+﻿namespace Exercises.Infrastructure;
 
-using System.Reflection;
-using System;
-using Microsoft.Extensions.Configuration;
+using Exercises.Infrastructure.Persistence;
+
+using Exercises.Application.Common.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using System.Reflection;
-using Exercise.Infrastructure.Persistence;
 
 public static class ProjectAssembly
 {
@@ -17,11 +17,9 @@ public static class ProjectAssembly
         services.AddDbContext<ExerciseDbContext>(options =>
                 options.UseSqlServer(
                     configuration.GetConnectionString("localhost"),
-                    b => b.MigrationsAssembly(typeof(TodoDbContext).Assembly.FullName)));
+                    b => b.MigrationsAssembly(typeof(ExerciseDbContext).Assembly.FullName)));
 
-        services.AddTransient<IDateTime, DateTimeService>();
-
-        services.AddScoped<IExerciseDbContext>(provider => provider.GetRequiredService<ExerciseDbContext>());
+        services.AddScoped<IExercisesDbContext>(provider => provider.GetRequiredService<ExerciseDbContext>());
 
         return services;
     }

@@ -9,8 +9,7 @@ public class Exercise
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public int? BodyPartId { get; set; }
-    public BodyPart? BodyPart { get; set; }
+    
     public string? Target { get; set; }
     public int? EquipmentId { get; set; }
     public Equipment? Equipment { get; set; }
