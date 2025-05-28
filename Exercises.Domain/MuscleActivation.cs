@@ -1,6 +1,6 @@
 ﻿namespace Exercises.Domain;
 
-public class MuscleActivation
+public class MuscleActivation : Entity
 {
     public int ExerciseId { get; set; }
     public Exercise Exercise { get; set; } = null!;

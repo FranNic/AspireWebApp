@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,10 +19,30 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspireWebApp.ServiceDefaults\AspireWebApp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Exercise.Infrastructure\Exercises.Infrastructure.csproj" />
+    <ProjectReference Include="..\Exercises.Application\Exercises.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- This picks up files from Infrastructure and copies them into API output dir -->
+    <Content Include="..\..\Infrastructure\Seeds\**\*.json">
+      <Link>Seeds\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="equipment.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="equipment.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

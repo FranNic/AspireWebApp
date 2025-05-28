@@ -1,5 +1,5 @@
 ﻿namespace Exercises.Domain;
-public class Set
+public class Set : Entity
 {
     public int Id { get; set; }
     public int Reps { get; set; }

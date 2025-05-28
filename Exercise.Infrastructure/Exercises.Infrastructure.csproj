@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Seed\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
@@ -25,6 +21,35 @@
   <ItemGroup>
     <ProjectReference Include="..\Exercises.Application\Exercises.Application.csproj" />
     <ProjectReference Include="..\Exercises.Domain\Exercises.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Seeds\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Seeds\equipment.json" />
+    <Content Remove="Seeds\Exercises.json" />
+    <Content Remove="Seeds\ExerciseTargets.json" />
+    <Content Remove="Seeds\Muscles.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Seeds\Exercises.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Seeds\ExerciseTargets.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Seeds\Muscles.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

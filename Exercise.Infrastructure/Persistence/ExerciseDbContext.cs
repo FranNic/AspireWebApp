@@ -1,18 +1,16 @@
 ﻿namespace Exercises.Infrastructure.Persistence;
 
-using Microsoft.EntityFrameworkCore;
+using Exercises.Application.Common.Interfaces;
+using Exercises.Domain;
 
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 
+using Microsoft.EntityFrameworkCore;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Exercises.Domain;
-using Exercises.Application.Common.Interfaces;
 
 public class ExerciseDbContext : DbContext, IExercisesDbContext
 {
@@ -22,7 +20,6 @@ public class ExerciseDbContext : DbContext, IExercisesDbContext
     public DbSet<Muscle> Muscles => Set<Muscle>();
     public DbSet<Set> Sets => Set<Set>();
     public DbSet<ActivationLevel> ActivationLevels => Set<ActivationLevel>();
-
 
     public ExerciseDbContext(DbContextOptions<ExerciseDbContext> options)
         : base(options)
@@ -41,23 +38,8 @@ public class ExerciseDbContext : DbContext, IExercisesDbContext
         modelBuilder.Entity<OutboxMessage>()
             .HasKey(o => o.MessageId);
 
-        modelBuilder.Entity<MuscleActivation>()
-            .HasKey(ma => new { ma.ExerciseId, ma.MuscleId });
-
-        modelBuilder.Entity<MuscleActivation>()
-            .HasOne(ma => ma.Exercise)
-            .WithMany(e => e.MuscleActivations)
-            .HasForeignKey(ma => ma.ExerciseId);
-
-        modelBuilder.Entity<MuscleActivation>()
-            .HasOne(ma => ma.Muscle)
-            .WithMany(m => m.Activations)
-            .HasForeignKey(ma => ma.MuscleId);
-
-        modelBuilder.Entity<MuscleActivation>()
-            .HasOne<ActivationLevel>()
-            .WithMany()
-            .HasForeignKey(ma => ma.ActivationLevelId);
+        modelBuilder.Entity<Equipment>()
+            .HasKey(e => e.Id);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

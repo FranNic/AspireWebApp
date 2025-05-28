@@ -1,6 +1,6 @@
 ﻿namespace Exercises.Domain;
 
-public class Muscle
+public class Muscle : Entity
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
