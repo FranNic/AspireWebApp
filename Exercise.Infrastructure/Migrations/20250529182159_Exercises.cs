@@ -117,7 +117,6 @@ namespace Exercises.Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Target = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     EquipmentId = table.Column<int>(type: "int", nullable: true),
-                    EquipmentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GifUrl = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     Version = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -179,7 +178,6 @@ namespace Exercises.Infrastructure.Migrations
                     ExerciseId = table.Column<int>(type: "int", nullable: false),
                     MuscleId = table.Column<int>(type: "int", nullable: false),
                     ActivationLevelId = table.Column<int>(type: "int", nullable: false),
-                    MuscleId1 = table.Column<int>(type: "int", nullable: true),
                     Version = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -203,11 +201,6 @@ namespace Exercises.Infrastructure.Migrations
                         principalTable: "Muscles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MuscleActivations_Muscles_MuscleId1",
-                        column: x => x.MuscleId1,
-                        principalTable: "Muscles",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -252,11 +245,6 @@ namespace Exercises.Infrastructure.Migrations
                 name: "IX_MuscleActivations_MuscleId",
                 table: "MuscleActivations",
                 column: "MuscleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MuscleActivations_MuscleId1",
-                table: "MuscleActivations",
-                column: "MuscleId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OutboxMessage_EnqueueTime",

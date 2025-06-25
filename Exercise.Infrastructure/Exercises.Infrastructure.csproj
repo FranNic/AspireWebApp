@@ -41,6 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Seeds\equipment.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Seeds\Exercises.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

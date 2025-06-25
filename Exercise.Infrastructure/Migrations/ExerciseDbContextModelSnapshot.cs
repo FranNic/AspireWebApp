@@ -78,10 +78,6 @@ namespace Exercises.Infrastructure.Migrations
                     b.Property<int?>("EquipmentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("EquipmentName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("GifUrl")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -138,9 +134,6 @@ namespace Exercises.Infrastructure.Migrations
                     b.Property<int>("ActivationLevelId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MuscleId1")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("Version")
                         .IsConcurrencyToken()
                         .HasColumnType("uniqueidentifier");
@@ -150,8 +143,6 @@ namespace Exercises.Infrastructure.Migrations
                     b.HasIndex("ActivationLevelId");
 
                     b.HasIndex("MuscleId");
-
-                    b.HasIndex("MuscleId1");
 
                     b.ToTable("MuscleActivations");
                 });
@@ -394,14 +385,10 @@ namespace Exercises.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Exercises.Domain.Muscle", "Muscle")
-                        .WithMany()
+                        .WithMany("Activations")
                         .HasForeignKey("MuscleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Exercises.Domain.Muscle", null)
-                        .WithMany("Activations")
-                        .HasForeignKey("MuscleId1");
 
                     b.Navigation("ActivationLevel");
 

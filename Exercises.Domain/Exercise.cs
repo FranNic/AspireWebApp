@@ -12,8 +12,6 @@ public class Exercise : Entity
     public string? Target { get; set; } 
     public int? EquipmentId { get; set; }
     public Equipment? Equipment { get; set; }
-    public string EquipmentName { get; set; }
-
     public string? GifUrl { get; set; }
 
     public ICollection<MuscleActivation> MuscleActivations { get; set; } = new List<MuscleActivation>();

@@ -9,10 +9,12 @@ public class MuscleActivationConfiguration : IEntityTypeConfiguration<MuscleActi
             .WithMany(e => e.MuscleActivations)
             .HasForeignKey(ma => ma.ExerciseId)
             .OnDelete(DeleteBehavior.Cascade);
+        
         builder.HasOne(ma => ma.Muscle)
-            .WithMany()
+            .WithMany(m=>m.Activations)
             .HasForeignKey(ma => ma.MuscleId)
             .OnDelete(DeleteBehavior.Cascade);
+        
         builder.HasOne(ma => ma.ActivationLevel)
             .WithMany()
             .HasForeignKey(ma => ma.ActivationLevelId)
