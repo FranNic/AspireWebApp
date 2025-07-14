@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
@@ -21,6 +23,7 @@
     <ProjectReference Include="..\AspireWebApp.ServiceDefaults\AspireWebApp.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Exercise.Infrastructure\Exercises.Infrastructure.csproj" />
     <ProjectReference Include="..\Exercises.Application\Exercises.Application.csproj" />
+    <ProjectReference Include="..\Shared\AspireWebApp.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

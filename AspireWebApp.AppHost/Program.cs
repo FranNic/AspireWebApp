@@ -10,15 +10,18 @@ var todoApi = builder.AddProject<Projects.Todo_API>("todo-api")
                         .WithReference(messaging)
                         .WithReference(todoContext);
 
+var exerciseApi = builder.AddProject<Projects.Exercises_API>("exercise-api")
+    .WithReference(exerciseContext)
+    .WithReference(messaging);
+
+
 builder.AddProject<Projects.AspireWebApp_Web>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithReference(cache)
     .WithReference(todoApi)
-    .WithReference(exerciseContext)
+    .WithReference(exerciseApi)
     .WithReference(messaging);
 
-builder.AddProject<Projects.Exercises_API>("exercise-api")
-    .WithReference(exerciseContext)
-    .WithReference(messaging);
+
 
 builder.Build().Run();

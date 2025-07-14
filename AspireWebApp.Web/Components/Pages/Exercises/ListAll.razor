@@ -1,0 +1,39 @@
+﻿@using global::Exercises.Application.DTOs
+@rendermode InteractiveServer
+@inject ExerciseApiClient ExercisesApiClient
+
+@page "/exercises/listall"
+<h3>ListAll</h3>
+
+<MudContainer>
+    <MudStack Row="true" Wrap="Wrap.Wrap">
+        @foreach (var item in collection.Items)
+        {
+            <MudCard Style="max-width:200px">
+                <MudCardMedia Image="@string.Format("images/{0}.jpg", item.GifUrl)" Style="background-size:contain" />
+                <MudCardContent>
+                    <MudText Typo="Typo.inherit">@item.Name</MudText>
+                    <MudText Typo="Typo.body2">@item.Target</MudText>
+                    <MudText Typo="Typo.body2">@item.Equipment</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary">Learn more</MudButton>
+                </MudCardActions>
+            </MudCard>
+
+        }
+    </MudStack>
+    <MudPagination Variant="Variant.Filled" Count="@collection.TotalPages" />
+</MudContainer>
+
+
+@code {
+    private PaginatedList<ExerciseDto> collection = new PaginatedList<ExerciseDto>();
+    private PaginationParameters PaginationParameters = new PaginationParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        collection = await ExercisesApiClient.GetExercisesAsync(PaginationParameters);
+    }
+
+}
