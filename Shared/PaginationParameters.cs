@@ -6,8 +6,8 @@ public class PaginationParameters : ISearchable
 {
     private int _pageSize = 50;
 
-    [FromQuery(Name="startIndex")]
-    public int StartIndex { get; set; } = 0;
+    [FromQuery(Name="pageNumber")]
+    public int Page { get; set; } = 0;
 
     [FromQuery(Name = "pageSize")]
     public int PageSize

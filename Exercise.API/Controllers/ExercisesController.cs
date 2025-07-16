@@ -30,7 +30,7 @@ public class ExercisesController : ControllerBase
     {
         var exercises = await _context.Exercises.AsNoTracking()
             .Search(pp.SearchValue!)
-            .PaginatedListAsync(pp.StartIndex, pp.PageSize, Exercise => Exercise.ToDto());
+            .PaginatedListAsync(pp.Page, pp.PageSize, Exercise => Exercise.ToDto());
 
         return Ok(exercises);
     }

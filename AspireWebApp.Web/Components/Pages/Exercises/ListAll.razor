@@ -23,7 +23,7 @@
 
         }
     </MudStack>
-    <MudPagination Variant="Variant.Filled" Count="@collection.TotalPages" />
+    <MudPagination Variant="Variant.Filled" Count="@collection.TotalPages" SelectedChanged="OnPageChanged" />
 </MudContainer>
 
 
@@ -31,9 +31,14 @@
     private PaginatedList<ExerciseDto> collection = new PaginatedList<ExerciseDto>();
     private PaginationParameters PaginationParameters = new PaginationParameters();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         collection = await ExercisesApiClient.GetExercisesAsync(PaginationParameters);
     }
 
+    private async Task OnPageChanged(int page)
+    {
+        PaginationParameters.Page = page;
+        collection = await ExercisesApiClient.GetExercisesAsync(PaginationParameters);
+    }
 }
